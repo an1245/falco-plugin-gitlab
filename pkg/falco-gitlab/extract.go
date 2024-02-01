@@ -37,35 +37,103 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 	switch field {
 	case "gitlab.event_id":
 		res = string(jdata.GetStringBytes("id"))
+	case "gitlab.event_type":
+		res = string(jdata.GetStringBytes("event_type"))
 	case "gitlab.author_id":
-		res = string(jdata.GetStringBytes("author_id"))
+		if len(jdata.GetStringBytes("author_id")) > 0 {
+			res = string(jdata.GetStringBytes("author_id"))
+		} else if len(jdata.GetStringBytes("details","author_id")) > 0{
+			res = string(jdata.GetStringBytes("details","author_id"))	
+		}
+	case "gitlab.author_name":
+		if len(jdata.GetStringBytes("author_name")) > 0 {
+			res = string(jdata.GetStringBytes("author_name"))
+		} else if len(jdata.GetStringBytes("details","author_name")) > 0{
+			res = string(jdata.GetStringBytes("details","author_name"))	
+		}
+	case "gitlab.author_email":
+		if len(jdata.GetStringBytes("author_email")) > 0 {
+			res = string(jdata.GetStringBytes("author_email"))
+		} else if len(jdata.GetStringBytes("details","author_email")) > 0{
+			res = string(jdata.GetStringBytes("details","author_email"))	
+		}
+	case "gitlab.author_class":
+		if len(jdata.GetStringBytes("author_class")) > 0 {
+			res = string(jdata.GetStringBytes("author_class"))
+		} else if len(jdata.GetStringBytes("details","author_class")) > 0{
+			res = string(jdata.GetStringBytes("details","author_class"))	
+		}
+	case "gitlab.custom_message":
+		if len(jdata.GetStringBytes("custom_message")) > 0 {
+			res = string(jdata.GetStringBytes("custom_message"))
+		} else if len(jdata.GetStringBytes("details","custom_message")) > 0{
+			res = string(jdata.GetStringBytes("details","custom_message"))	
+		}
 	case "gitlab.entity_id":
-		res = string(jdata.GetStringBytes("entity_id"))
+		if len(jdata.GetStringBytes("entity_id")) > 0 {
+			res = string(jdata.GetStringBytes("entity_id"))
+		} else if len(jdata.GetStringBytes("details","entity_id")) > 0{
+			res = string(jdata.GetStringBytes("details","entity_id"))	
+		}
 	case "gitlab.entity_type":
-		res = string(jdata.GetStringBytes("entity_type"))
+		if len(jdata.GetStringBytes("entity_type")) > 0 {
+			res = string(jdata.GetStringBytes("entity_type"))
+		} else if len(jdata.GetStringBytes("details","entity_type")) > 0{
+			res = string(jdata.GetStringBytes("details","entity_type"))	
+		}
+	case "gitlab.entity_path":
+		if len(jdata.GetStringBytes("entity_path")) > 0 {
+			res = string(jdata.GetStringBytes("entity_path"))
+		} else if len(jdata.GetStringBytes("details","entity_path")) > 0 {
+			res = string(jdata.GetStringBytes("details","entity_path"))	
+		}
 	case "gitlab.created_at":
 		res = string(jdata.GetStringBytes("created_at"))
-	case "gitlab.operation_type":
+	case "gitlab.ip_address":
+		if len(jdata.GetStringBytes("ip_address")) > 0 {
+			res = string(jdata.GetStringBytes("ip_address"))
+		} else if len(jdata.GetStringBytes("details","ip_address")) > 0{
+			res = string(jdata.GetStringBytes("details","ip_address"))	
+		}
+	case "gitlab.op_type":
 		// check whether add, change,  remove
-		if len(jdata.GetStringBytes("add")) > 0 {
+		if len(jdata.GetStringBytes("details","add")) > 0 {
 			res = "add"
-		} else if len(jdata.GetStringBytes("change")) > 0 {
+		} else if len(jdata.GetStringBytes("details","change")) > 0 {
 			res = "change"
-		} else if len(jdata.GetStringBytes("remove")) > 0 {
+		} else if len(jdata.GetStringBytes("details","remove")) > 0 {
 			res = "remove"
 		}
-	case "gitlab.operation_type_details":
-		if len(jdata.GetStringBytes("add")) > 0 {
-			res = string(jdata.GetStringBytes("add"))
-		} else if len(jdata.GetStringBytes("change")) > 0 {
-			res = string(jdata.GetStringBytes("change"))
-		} else if len(jdata.GetStringBytes("remove")) > 0 {
-			res = string(jdata.GetStringBytes("remove"))
+	case "gitlab.op_item":
+		if len(jdata.GetStringBytes("details","add")) > 0 {
+			res = string(jdata.GetStringBytes("details","add"))
+		} else if len(jdata.GetStringBytes("details","change")) > 0 {
+			res = string(jdata.GetStringBytes("details","change"))
+		} else if len(jdata.GetStringBytes("details","remove")) > 0 {
+			res = string(jdata.GetStringBytes("details","remove"))
 		}
-	case "gitlab.change_from":
-		res = string(jdata.GetStringBytes("from"))
-	case "gitlab.change_to":
-		res = string(jdata.GetStringBytes("to"))
+	case "gitlab.op_changed_from":
+		res = string(jdata.GetStringBytes("details","from"))
+	case "gitlab.op_changed_to":
+		res = string(jdata.GetStringBytes("details","to"))
+	case "gitlab.target_id":
+		if len(jdata.GetStringBytes("target_id")) > 0 {
+			res = string(jdata.GetStringBytes("target_id"))
+		} else if len(jdata.GetStringBytes("details","target_id")) > 0{
+			res = string(jdata.GetStringBytes("details","target_id"))	
+		}
+	case "gitlab.target_type":
+		if len(jdata.GetStringBytes("target_type")) > 0 {
+			res = string(jdata.GetStringBytes("target_type"))
+		} else if len(jdata.GetStringBytes("details","target_type")) > 0{
+			res = string(jdata.GetStringBytes("details","target_type"))	
+		}
+	case "gitlab.target_details":
+		if len(jdata.GetStringBytes("target_details")) > 0 {
+			res = string(jdata.GetStringBytes("target_details"))
+		} else if len(jdata.GetStringBytes("details","target_details")) > 0{
+			res = string(jdata.GetStringBytes("details","target_details"))	
+		}
 	default:
 		return false, ""
 	}
