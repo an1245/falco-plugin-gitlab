@@ -25,6 +25,7 @@ import (
 	"github.com/falcosecurity/plugin-sdk-go/pkg/sdk/plugins/source"
 	"github.com/oschwald/geoip2-golang"
 	"github.com/valyala/fastjson"
+	"net/http"
 )
 
 const (
@@ -52,6 +53,9 @@ type PluginInstance struct {
 	source.BaseInstance
 	gitlabChannel chan []byte
 	geodb      geoip2.Reader
+	whSrv      *http.Server
+	whSrvChan      chan []byte
+	whSecret       string
 }
 
 // Return the plugin info to the framework.

@@ -18,22 +18,18 @@ package falcogitlab
 
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"math"
 	"net"
-	"net/http"
-	"net/url"
 	"os"
-	"reflect"
 	"time"
+	"strings"
 
 	"github.com/falcosecurity/plugin-sdk-go/pkg/sdk"
 	"github.com/falcosecurity/plugin-sdk-go/pkg/sdk/plugins/source"
-	"github.com/oschwald/geoip2-golang"
+	//"github.com/oschwald/geoip2-golang"
 
 	"github.com/xanzy/go-gitlab"
 	
@@ -43,6 +39,7 @@ func (p *Plugin) initInstance(oCtx *PluginInstance) error {
 
 	// think of plugin_init as initializing the plugin software
 
+	oCtx.whSecret = p.config.ValidationToken
 	oCtx.gitlabChannel = nil
 	return nil
 
@@ -100,7 +97,7 @@ func (o *PluginInstance) NextBatch(pState sdk.PluginState, evts sdk.EventWriters
 			return 0, fmt.Errorf("GitLab Plugin ERROR: Couldn't write GitLab Event data events - %v", err)
 		}
 		if written < len(gitlabData) {
-			return 0, fmt.Errorf("GitLab Plugin ERROR: GitLab message too long: %d, max %d supported", len(boxData), written)
+			return 0, fmt.Errorf("GitLab Plugin ERROR: GitLab message too long: %d, max %d supported", len(gitlabData), written)
 		}
 
 	case <-afterCh:
@@ -173,8 +170,8 @@ func fetchAuditAPI(p *Plugin, oCtx *PluginInstance, channel chan []byte) {
 		log.Printf("GitLab Plugin - Starting Audit Event API requester")
 	}
 	
-	querytimestamp :=  time.Now().UTC().Format("2006-01-02T15:04:05Z") 
-	iso8601timestamp := fmt.Sprintf("%v", querytimestamp )
+	querytimestamp :=  time.Now().UTC()
+
 	// Outerloop is used for the backoff processing
 	// after timeout, it continues this loop essentially restarting the whole process
 outerloop:
@@ -204,10 +201,11 @@ outerloop:
 
 		// Scope the Audit Event Query to only the events since the timestamp
 		auditEventOptions := gitlab.ListAuditEventsOptions {
-			CreatedAfter: iso8601timestamp
+			CreatedAfter: &querytimestamp,
 		}
 
-		eventsArray, httpResponse, err := git.ListInstanceAuditEvents(auditEventOptions)
+
+		eventsArray, httpResponse, err := git.AuditEvents.ListInstanceAuditEvents(&auditEventOptions)
 		if err != nil || httpResponse.StatusCode != 200 {
 			errorMessage := "GitLab Plugin ERROR: Could not fetch initial Admin Streaming Logs Stream Position - " + string(err.Error())
 			if breakOut(backoffcount, p.config.Debug, errorMessage, oCtx) {
@@ -232,6 +230,8 @@ outerloop:
 			}
 
 			// If Geolocation enrichment is enabled then enrich the IP with Geolocation info
+			checkGeoDB := false
+
 
 			if checkGeoDB && len(ipstr) > 0 {
 				ip := net.ParseIP(ipstr)
@@ -254,7 +254,7 @@ outerloop:
 			// Marshall Event into JSON
 			jsonEvent, err := json.Marshal(tmpFalcoEvent)
 			if err != nil {
-				errorMessage := "GitLab Plugin:  Failed to Marshal FalcoEvent to JSON")
+				errorMessage := "GitLab Plugin:  Failed to Marshal FalcoEvent to JSON"
 				if breakOut(backoffcount, p.config.Debug, errorMessage, oCtx) {
 					backoffcount += 1
 					continue outerloop
@@ -275,7 +275,9 @@ outerloop:
 
 			// Check if this is the last event and if it is then update the timestamp
 			if i == 0 {
-				iso8601timestamp = eventsArray[i].created_at
+				querytimestamp = *eventsArray[i].CreatedAt
+				
+			
 			}
 		
 		}
@@ -284,13 +286,14 @@ outerloop:
 		if p.config.Debug && p.config.DebugLevel >= 1 {
 			println("GitLab Plugin: Closing GitLab Connection")
 		}
-		git.Close()
+		
+		
 
 
 	}
 }
 
-type GitLabEvent = gitlab.auditEvent
+type GitLabEvent = gitlab.AuditEvent
 
 type FalcoEvent struct {
     City string

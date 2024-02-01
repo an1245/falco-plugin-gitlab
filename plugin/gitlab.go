@@ -26,7 +26,7 @@ import (
 
 func init() {
 	plugins.SetFactory(func() plugins.Plugin {
-		p := &gitlab.Plugin{}
+		p := &falcogitlab.Plugin{}
 		source.Register(p)
 		extractor.Register(p)
 		return p
