@@ -27,7 +27,26 @@ import (
 // Return the fields supported for extraction.
 func (p *Plugin) Fields() []sdk.FieldEntry {
 	return []sdk.FieldEntry{
-		{Type: "string", Name: "gitlab.event_id", Display: "Access Token ID", Desc: "Access Token ID"},
+		{Type: "string", Name: "gitlab.event_id", Display: "GitLab Audit Event ID", Desc: "What was the ID of the Audit Event"},
+		{Type: "string", Name: "gitlab.event_type", Display: "GitLab Audit Event Type", Desc: "What type of audit event is it?"},
+		{Type: "string", Name: "gitlab.author_id", Display: "GitLab Author ID", Desc: "What was the ID od the user that made the change"},
+		{Type: "string", Name: "gitlab.author_name", Display: "GitLab Author Name", Desc: "What was the name of the user that made the change"},
+		{Type: "string", Name: "gitlab.author_email", Display: "GitLab Author Email", Desc: "What was the email of the user that made the change"},
+		{Type: "string", Name: "gitlab.author_class", Display: "GitLab Author Class", Desc: "What class of author made the change"},
+		{Type: "string", Name: "gitlab.custom_message", Display: "GitLab Custom Audit Message", Desc: "Contents of a GitLab Custom Message"},
+		{Type: "string", Name: "gitlab.entity_id", Display: "GitLab Entity ID", Desc: "What was the ID of the entity that was changed"},
+		{Type: "string", Name: "gitlab.entity_type", Display: "GitLab Entity Type", Desc: "What type of entity was changed"},
+		{Type: "string", Name: "gitlab.entity_path", Display: "GitLab Entity Path", Desc: "What was the path of the entity that was changed"},
+		{Type: "string", Name: "gitlab.created_at", Display: "GitLab Audit Event Creation Date", Desc: "GitLab Audit Event Created Date"},
+		{Type: "string", Name: "gitlab.ip_address", Display: "GitLab user IP address", Desc: "GitLab IP Address who generated Event"},
+		{Type: "string", Name: "gitlab.op_type", Display: "GitLab Operation type", Desc: "GitLab Operation Type (add/remove/change)"},
+		{Type: "string", Name: "gitlab.op_item", Display: "GitLab affected item", Desc: "What was added, removed or changed"},
+		{Type: "string", Name: "gitlab.op_changed_from", Display: "GitLab Changed From", Desc: "What was it changed from"},
+		{Type: "string", Name: "gitlab.op_changed_to", Display: "GitLab Changed To", Desc: "What was it changed to?"},
+		{Type: "string", Name: "gitlab.target_id", Display: "GitLab ID of target changed", Desc: "ID of target object that was changed"},
+		{Type: "string", Name: "gitlab.target_type", Display: "GitLab Type of target changed", Desc: "Type of target object that was changed"},
+		{Type: "string", Name: "gitlab.target_details", Display: "GitLab Idetails of change to target", Desc: "Details of the change to the target"},
+
 	}
 }
 
