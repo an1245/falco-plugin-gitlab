@@ -17,7 +17,7 @@ limitations under the License.
 package main
 
 import (
-	"falco-gitlab/pkg/falco-gitlab"
+	"falcogitlab/pkg/falcogitlab"
 
 	"github.com/falcosecurity/plugin-sdk-go/pkg/sdk/plugins"
 	"github.com/falcosecurity/plugin-sdk-go/pkg/sdk/plugins/extractor"
