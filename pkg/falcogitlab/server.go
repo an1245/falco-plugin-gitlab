@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"errors"
+	"github.com/xanzy/go-gitlab"
+	"encoding/json"
 
 )
 
@@ -55,7 +57,7 @@ func server(p *Plugin, oCtx *PluginInstance) (error) {
 
 func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance) {
 	
-	// Get 
+	var event gitlab.AuditEvent
 	
 	headers := r.Header
 	val, ok := headers["X-Gitlab-Event-Streaming-Token"]
@@ -64,18 +66,46 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance) {
 		if len(tmpGitLabToken) > 0 {
 			if tmpGitLabToken == oCtx.whSecret {
 				// Token passed authentication
+				err := json.NewDecoder(r.Body).Decode(&event)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusBadRequest)
+					return
+				}
+				tmpFalcoEvent := FalcoEvent{GitLabEvent:&event}
+				
+				// Marshall Event into JSON
+				jsonEvent, err := json.Marshal(tmpFalcoEvent)
+				if err != nil {
+					log.Printf("GitLab Plugin Error: Error marshalling Event to JSON - %v", err)
+				}
+				
+				oCtx.whSrvChan <- jsonEvent
 
 
-				//oCtx.whSrvChan <- jsonString
-
+			} else {
+				// Token didn't match configure secret
+				// Respond back with a failure
+				oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it didn't match configured secret")
+				http.Error(w, "Authetication Failed", http.StatusUnauthorized )
+				return
 			}
+		} else {
+			// Token was 0 length
+			// Respond back with a failure
+			oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it was zero length")
+			http.Error(w, "Authetication Failed", http.StatusUnauthorized )
+			return
 		}
 	} else {
-		// Token failed to authenticate
-		// Need to respond back with a failure
-
+		// Token was not provided in header
+		// Respond back with a failure
+		oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request received without X-Gitlab-Event-Streaming-Token header")
+		http.Error(w, "Authetication Failed", http.StatusUnauthorized )
+		return
 	}
 }
+
+
 
 func fileExists(fname string) bool {
 	_, err := os.Stat(fname)

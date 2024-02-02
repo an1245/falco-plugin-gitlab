@@ -51,10 +51,10 @@ type Plugin struct {
 // which is returned by Open() and deinitialized during Close().
 type PluginInstance struct {
 	source.BaseInstance
-	gitlabChannel chan []byte
 	geodb      geoip2.Reader
 	whSrv      *http.Server
 	whSrvChan      chan []byte
+	whSrvErrorChan chan []byte
 	whSecret       string
 }
 

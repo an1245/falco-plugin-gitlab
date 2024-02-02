@@ -40,7 +40,7 @@ func (p *Plugin) initInstance(oCtx *PluginInstance) error {
 	// think of plugin_init as initializing the plugin software
 
 	oCtx.whSecret = p.config.ValidationToken
-	oCtx.gitlabChannel = nil
+	oCtx.whSrvChan = nil
 	return nil
 
 }
@@ -62,10 +62,11 @@ func (p *Plugin) Open(params string) (source.Instance, error) {
 	}
 
 	// Create the channel
-	oCtx.gitlabChannel = make(chan []byte, 128)
+	oCtx.whSrvChan = make(chan []byte, 128)
+	oCtx.whSrvErrorChan = make(chan []byte, 128)
 
 	// Launch the APIClient
-	go fetchAuditAPI(p, oCtx, oCtx.gitlabChannel)
+	go fetchAuditAPI(p, oCtx)
 
 	return oCtx, nil
 }
@@ -77,7 +78,7 @@ func (oCtx *PluginInstance) Close() {
 }
 
 // Produce and return a new batch of events.
-func (o *PluginInstance) NextBatch(pState sdk.PluginState, evts sdk.EventWriters) (int, error) {
+func (oCtx *PluginInstance) NextBatch(pState sdk.PluginState, evts sdk.EventWriters) (int, error) {
 	// Casting to our plugin type
 	p := pState.(*Plugin)
 
@@ -87,10 +88,11 @@ func (o *PluginInstance) NextBatch(pState sdk.PluginState, evts sdk.EventWriters
 
 	// Receive the event from the webserver channel with a 1 sec timeout
 	var gitlabData []byte
+	var gitlabErrorData []byte
 
 	afterCh := time.After(1 * time.Second)
 	select {
-	case gitlabData = <-o.gitlabChannel:
+	case gitlabData = <- oCtx.whSrvChan:
 		// Process data from box channel
 		written, err := writer.Write(gitlabData)
 		if err != nil {
@@ -100,6 +102,21 @@ func (o *PluginInstance) NextBatch(pState sdk.PluginState, evts sdk.EventWriters
 			return 0, fmt.Errorf("GitLab Plugin ERROR: GitLab message too long: %d, max %d supported", len(gitlabData), written)
 		}
 
+	case gitlabErrorData = <- oCtx.whSrvErrorChan:
+
+		falcoalert := ErrorMessage{"pluginerror", string(gitlabErrorData)}
+		falcoalertjson, err := json.Marshal(falcoalert)
+		if err != nil {
+			log.Printf("GitLab Plugin ERROR -  NextBatch(): Couldn't Create Plugin Error JSON")
+		}
+		written, err := writer.Write(falcoalertjson)
+		if err != nil {
+			return 0, fmt.Errorf("GitLab Plugin ERROR: Couldn't write Error Event - %v", err)
+		}
+		if written < len(gitlabErrorData) {
+			return 0, fmt.Errorf("GitLab Plugin ERROR: event message too long: %d, max %d supported", len(gitlabErrorData), written)
+		}
+		
 	case <-afterCh:
 		p.jdataEvtnum = math.MaxUint64
 		return 0, sdk.ErrTimeout
@@ -139,7 +156,7 @@ func breakOut(backoffcount int, Debug bool, errorMessage string, oCtx *PluginIns
 		if err != nil {
 			log.Printf("GitLab Plugin Error - breakOut(): Couldn't Create Plugin Error JSON")
 		}
-		oCtx.gitlabChannel <- falcoalertjson
+		oCtx.whSrvChan <- falcoalertjson
 		// End: Send an alert to Falco
 
 		return false
@@ -155,7 +172,7 @@ func breakOut(backoffcount int, Debug bool, errorMessage string, oCtx *PluginIns
 	if err != nil {
 		log.Printf("GitLab Plugin Error - breakOut(): Couldn't Create Plugin Error JSON")
 	}
-	oCtx.gitlabChannel <- falcoalertjson
+	oCtx.whSrvChan <- falcoalertjson
 	// End: Send an alert to Falco
 
 	// Back off for a while
@@ -163,7 +180,7 @@ func breakOut(backoffcount int, Debug bool, errorMessage string, oCtx *PluginIns
 	return true
 }
 
-func fetchAuditAPI(p *Plugin, oCtx *PluginInstance, channel chan []byte) {
+func fetchAuditAPI(p *Plugin, oCtx *PluginInstance) {
 	backoffcount := 1
 
 	if p.config.Debug && p.config.DebugLevel >= 0 {
@@ -271,7 +288,7 @@ outerloop:
 
 
 			// Send the JSON event through the channel
-			oCtx.gitlabChannel <- jsonEvent
+			oCtx.whSrvChan <- jsonEvent
 
 			// Check if this is the last event and if it is then update the timestamp
 			if i == 0 {
