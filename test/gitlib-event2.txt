@@ -26,5 +26,21 @@
     "target_type": "AuditEvents::Streaming::InstanceHeader",
     "target_id": 32,
     "event_type": "audit_events_streaming_instance_headers_create"
+  },{
+    "id": 2,
+    "author_id": 1,
+    "entity_id": 60,
+    "entity_type": "Group",
+    "details": {
+      "add": "group",
+      "author_name": "Administrator",
+      "author_email": "admin@example.com",
+      "target_id": "flightjs",
+      "target_type": "Group",
+      "target_details": "flightjs",
+      "ip_address": "127.0.0.1",
+      "entity_path": "flightjs"
+    },
+    "created_at": "2019-08-27T18:36:44.162Z"
   }
   ]

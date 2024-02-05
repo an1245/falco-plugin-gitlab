@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 
+
 	"github.com/falcosecurity/plugin-sdk-go/pkg/sdk"
 	"github.com/valyala/fastjson"
 )
@@ -108,7 +109,6 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 			res = string(jdata.GetStringBytes("details","entity_path"))	
 		}
 	case "gitlab.failed_login":
-		print("in failed login" + string(jdata.GetStringBytes("failed_login")))
 		res = string(jdata.GetStringBytes("details","failed_login"))
 	case "gitlab.created_at":
 		res = string(jdata.GetStringBytes("created_at"))
@@ -140,10 +140,29 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 	case "gitlab.op_changed_to":
 		res = string(jdata.GetStringBytes("details","to"))
 	case "gitlab.target_id":
-		if jdata.GetInt("target_id") > 0 {
-			res = fmt.Sprintf("%v",jdata.GetInt("target_id"))
-		} else if jdata.GetInt("details","target_id") > 0{
-			res = fmt.Sprintf("%v",jdata.GetInt("details","target_id"))	
+		if jdata.Exists("target_id") {
+			valueType := jdata.Get("target_id").Type()
+			if valueType == fastjson.TypeNumber {
+				if jdata.GetInt("target_id") > 0 {
+					res = fmt.Sprintf("%v",jdata.GetInt("target_id"))
+				} 
+			} else if valueType == fastjson.TypeString  {
+				if len(jdata.GetStringBytes("target_id")) > 0 {
+					res = string(jdata.GetStringBytes("target_id"))
+				}
+			}
+		} else if jdata.Exists("details", "target_id") {
+			valueType := jdata.Get("details", "target_id").Type()
+			if valueType == fastjson.TypeNumber {
+				if jdata.GetInt("details","target_id") > 0 {
+					res = fmt.Sprintf("%v",jdata.GetInt("details","target_id"))
+				} 
+			} else if valueType == fastjson.TypeString  {
+				if len(jdata.GetStringBytes("details","target_id")) > 0 {
+					res = string(jdata.GetStringBytes("details","target_id"))
+				}
+			}
+
 		}
 	case "gitlab.target_type":
 		if len(jdata.GetStringBytes("target_type")) > 0 {
