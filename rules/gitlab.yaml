@@ -3,6 +3,7 @@
   condition: gitlab.created_at contains "20"
   output: |
       GitLab Catch All rule: 
+      -------------------------------------------------------------------------------------------
       Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
       IP Address: %gitlab.ip_address, 
       Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
@@ -11,6 +12,7 @@
       Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
       Custom Message: %gitlab.custom_message
       Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
   priority: WARNING
   source: gitlab
   tags: [gitlab]
