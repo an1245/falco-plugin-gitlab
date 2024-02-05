@@ -37,6 +37,7 @@ func (p *Plugin) Fields() []sdk.FieldEntry {
 		{Type: "string", Name: "gitlab.entity_id", Display: "GitLab Entity ID", Desc: "What was the ID of the entity that was changed"},
 		{Type: "string", Name: "gitlab.entity_type", Display: "GitLab Entity Type", Desc: "What type of entity was changed"},
 		{Type: "string", Name: "gitlab.entity_path", Display: "GitLab Entity Path", Desc: "What was the path of the entity that was changed"},
+		{Type: "string", Name: "gitlab.failed_login", Display: "GitLab Failed Login", Desc: "Was this a failed login?"},
 		{Type: "string", Name: "gitlab.created_at", Display: "GitLab Audit Event Creation Date", Desc: "GitLab Audit Event Created Date"},
 		{Type: "string", Name: "gitlab.ip_address", Display: "GitLab user IP address", Desc: "GitLab IP Address who generated Event"},
 		{Type: "string", Name: "gitlab.op_type", Display: "GitLab Operation type", Desc: "GitLab Operation Type (add/remove/change)"},
@@ -55,15 +56,14 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 
 	switch field {
 	case "gitlab.event_id":
-		res = string(jdata.GetInt("id"))
+		res = fmt.Sprintf("%v", jdata.GetInt("id"))
 	case "gitlab.event_type":
 		res = string(jdata.GetStringBytes("event_type"))
 	case "gitlab.author_id":
-		
 		if jdata.GetInt("author_id") > 0 {
-			res = string(jdata.GetInt("author_id"))
+			res = fmt.Sprintf("%v", jdata.GetInt("author_id"))
 		} else if jdata.GetInt("details","author_id") > 0 {
-			res = string(jdata.GetInt("details","author_id"))	
+			res = fmt.Sprintf("%v", jdata.GetInt("details","author_id"))	
 		}
 	case "gitlab.author_name":
 		if len(jdata.GetStringBytes("author_name")) > 0 {
@@ -74,7 +74,7 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 	case "gitlab.author_email":
 		if len(jdata.GetStringBytes("author_email")) > 0 {
 			res = string(jdata.GetStringBytes("author_email"))
-		} else if len(jdata.GetStringBytes("details","author_email")) > 0{
+		} else if len(jdata.GetStringBytes("details","author_email")) > 0 {
 			res = string(jdata.GetStringBytes("details","author_email"))	
 		}
 	case "gitlab.author_class":
@@ -91,9 +91,9 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 		}
 	case "gitlab.entity_id":
 		if jdata.GetInt("entity_id") > 0 {
-			res = string(jdata.GetInt("entity_id"))
+			res = fmt.Sprintf("%v", jdata.GetInt("entity_id"))
 		} else if jdata.GetInt("details","entity_id") > 0 {
-			res = string(jdata.GetInt("details","entity_id"))	
+			res = fmt.Sprintf("%v", jdata.GetInt("details","entity_id"))	
 		}
 	case "gitlab.entity_type":
 		if len(jdata.GetStringBytes("entity_type")) > 0 {
@@ -107,6 +107,9 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 		} else if len(jdata.GetStringBytes("details","entity_path")) > 0 {
 			res = string(jdata.GetStringBytes("details","entity_path"))	
 		}
+	case "gitlab.failed_login":
+		print("in failed login" + string(jdata.GetStringBytes("failed_login")))
+		res = string(jdata.GetStringBytes("details","failed_login"))
 	case "gitlab.created_at":
 		res = string(jdata.GetStringBytes("created_at"))
 	case "gitlab.ip_address":
@@ -138,9 +141,9 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 		res = string(jdata.GetStringBytes("details","to"))
 	case "gitlab.target_id":
 		if jdata.GetInt("target_id") > 0 {
-			res = string(jdata.GetInt("target_id"))
+			res = fmt.Sprintf("%v",jdata.GetInt("target_id"))
 		} else if jdata.GetInt("details","target_id") > 0{
-			res = string(jdata.GetInt("details","target_id"))	
+			res = fmt.Sprintf("%v",jdata.GetInt("details","target_id"))	
 		}
 	case "gitlab.target_type":
 		if len(jdata.GetStringBytes("target_type")) > 0 {

@@ -24,3 +24,5 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.29.1 // indirect
 )
+
+replace github.com/xanzy/go-gitlab => github.com/an1245/go-gitlab v0.0.0-20240205022857-a9f900add94a
