@@ -55,14 +55,15 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 
 	switch field {
 	case "gitlab.event_id":
-		res = string(jdata.GetStringBytes("id"))
+		res = string(jdata.GetInt("id"))
 	case "gitlab.event_type":
 		res = string(jdata.GetStringBytes("event_type"))
 	case "gitlab.author_id":
-		if len(jdata.GetStringBytes("author_id")) > 0 {
-			res = string(jdata.GetStringBytes("author_id"))
-		} else if len(jdata.GetStringBytes("details","author_id")) > 0{
-			res = string(jdata.GetStringBytes("details","author_id"))	
+		
+		if jdata.GetInt("author_id") > 0 {
+			res = string(jdata.GetInt("author_id"))
+		} else if jdata.GetInt("details","author_id") > 0 {
+			res = string(jdata.GetInt("details","author_id"))	
 		}
 	case "gitlab.author_name":
 		if len(jdata.GetStringBytes("author_name")) > 0 {
@@ -89,10 +90,10 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 			res = string(jdata.GetStringBytes("details","custom_message"))	
 		}
 	case "gitlab.entity_id":
-		if len(jdata.GetStringBytes("entity_id")) > 0 {
-			res = string(jdata.GetStringBytes("entity_id"))
-		} else if len(jdata.GetStringBytes("details","entity_id")) > 0{
-			res = string(jdata.GetStringBytes("details","entity_id"))	
+		if jdata.GetInt("entity_id") > 0 {
+			res = string(jdata.GetInt("entity_id"))
+		} else if jdata.GetInt("details","entity_id") > 0 {
+			res = string(jdata.GetInt("details","entity_id"))	
 		}
 	case "gitlab.entity_type":
 		if len(jdata.GetStringBytes("entity_type")) > 0 {
@@ -136,10 +137,10 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 	case "gitlab.op_changed_to":
 		res = string(jdata.GetStringBytes("details","to"))
 	case "gitlab.target_id":
-		if len(jdata.GetStringBytes("target_id")) > 0 {
-			res = string(jdata.GetStringBytes("target_id"))
-		} else if len(jdata.GetStringBytes("details","target_id")) > 0{
-			res = string(jdata.GetStringBytes("details","target_id"))	
+		if jdata.GetInt("target_id") > 0 {
+			res = string(jdata.GetInt("target_id"))
+		} else if jdata.GetInt("details","target_id") > 0{
+			res = string(jdata.GetInt("details","target_id"))	
 		}
 	case "gitlab.target_type":
 		if len(jdata.GetStringBytes("target_type")) > 0 {

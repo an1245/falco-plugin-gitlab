@@ -24,12 +24,29 @@ import (
 	"errors"
 	"github.com/xanzy/go-gitlab"
 	"encoding/json"
+	"strings"
 
 )
 
-func server(p *Plugin, oCtx *PluginInstance) (error) {
-	secretsDir := p.config.SecretsDir
+func createError(message string, oCtx *PluginInstance, p *Plugin) {
+	// Start: Send an alert to Falco
+	if p.config.Debug {
+		log.Print(message)
+	}
+	
+	falcoalert := ErrorMessage{"pluginerror", message}
+	falcoalertjson, err := json.Marshal(falcoalert)
+	if err != nil {
+		log.Printf("GitLab Plugin Error - breakOut(): Couldn't Create Plugin Error JSON")
+	}
+	oCtx.whSrvErrorChan <- falcoalertjson
 
+}
+
+func webhookServer(p *Plugin, oCtx *PluginInstance){
+	
+	// Get the certificates from the directory
+	secretsDir := p.config.SecretsDir
 	crtName := secretsDir + "/server.crt"
 	keyName := secretsDir + "/server.key"
 
@@ -37,70 +54,95 @@ func server(p *Plugin, oCtx *PluginInstance) (error) {
 
 	isHttps := p.config.UseHTTPs
 
+	// Check HTTPS certificates exist
 	if isHttps {
 		if !(fileExists(crtName) && fileExists(keyName)) {
-			err := fmt.Errorf("GitLab Plugin: Webhook webserver is configured to use HTTPs, but either %s or %s can't be found. Either provide the secrets, or set the UseHTTPs init parameter to false", keyName, crtName)
-			return err
+			errorMessage := fmt.Sprintf("GitLab Plugin: Webhook webserver is configured to use HTTPs, but either %s or %s can't be found. Either provide the secrets, or set the UseHTTPs init parameter to false", keyName, crtName)
+			createError(errorMessage,oCtx,p)
+			return
 		}
 	}
 
+	// Create HTTP Connection Handler
 	mux := http.NewServeMux()
 	mux.Handle("/", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			handleHook(w, r, oCtx)
+			handleHook(w, r, oCtx,p)
 		},
 	))
 
+	// Create HTTP Server
 	oCtx.whSrv = &http.Server{
 		Handler: mux,
 	}
 
+	// Connect HTTP Server
 	var err error
 	if isHttps {
-		log.Printf("GitLab Plugin: starting HTTPs webhook server on port 443\n")
+		if p.config.Debug {
+			log.Printf("GitLab Plugin: starting HTTPs webhook server on port 443\n")
+		}
 		err = oCtx.whSrv.ListenAndServeTLS(crtName, keyName)
 	} else {
-		log.Printf("GitLab Plugin: starting HTTP webhook server on port 80\n")
+		if p.config.Debug {
+			log.Printf("GitLab Plugin: starting HTTP webhook server on port 80\n")
+		}
 		err = oCtx.whSrv.ListenAndServe()
 	}
 
 	if err != nil {
-		return err
+		errorMessage := fmt.Sprintf("GitLab Plugin: Webhook webserver is configured to use HTTPs, but either %s or %s can't be found. Either provide the secrets, or set the UseHTTPs init parameter to false", keyName, crtName)
+		createError(errorMessage,oCtx,p)
+		return
 	}
 
-	return nil
+	return 
 }
 
-func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance) {
+func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p *Plugin) {
 	
-	var event gitlab.AuditEvent
+	event := []gitlab.AuditEvent{}
 	
 	headers := r.Header
 	val, ok := headers["X-Gitlab-Event-Streaming-Token"]
 	if ok {
-		tmpGitLabToken := fmt.Sprint(val)
+		tmpGitLabToken := strings.Join(val,"")
 		if len(tmpGitLabToken) > 0 {
 			if tmpGitLabToken == oCtx.whSecret {
 				// Token passed authentication
 				err := json.NewDecoder(r.Body).Decode(&event)
 				if err != nil {
+					errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't decode event" )
+					createError(errorMessage,oCtx,p)
 					http.Error(w, err.Error(), http.StatusBadRequest)
 					return
 				}
-				tmpFalcoEvent := FalcoEvent{GitLabEvent:&event}
 				
-				// Marshall Event into JSON
-				jsonEvent, err := json.Marshal(tmpFalcoEvent)
-				if err != nil {
-					log.Printf("GitLab Plugin Error: Error marshalling Event to JSON - %v", err)
-				}
+				for i := range event {
+
+						tmpFalcoEvent := FalcoEvent{GitLabEvent:&event[i]}
 				
-				oCtx.whSrvChan <- jsonEvent
+						// Marshall Event into JSON
+						jsonEvent, err := json.Marshal(tmpFalcoEvent)
+						if err != nil {
+							http.Error(w, err.Error(), http.StatusBadRequest)
+							log.Printf("GitLab Plugin Error: Error marshalling Event to JSON - %v", err)
+						}
+						
+						oCtx.whSrvChan <- jsonEvent
+					}
+
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte("Request Successful"))
+				return
 
 
 			} else {
 				// Token didn't match configure secret
 				// Respond back with a failure
+				if p.config.Debug {
+					log.Printf("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it didn't match configured secret (token provided: %v | token configured: %v)", val, oCtx.whSecret )
+				}
 				oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it didn't match configured secret")
 				http.Error(w, "Authetication Failed", http.StatusUnauthorized )
 				return
@@ -108,6 +150,9 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance) {
 		} else {
 			// Token was 0 length
 			// Respond back with a failure
+			if p.config.Debug {
+				log.Printf("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it was zero length")
+			}
 			oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it was zero length")
 			http.Error(w, "Authetication Failed", http.StatusUnauthorized )
 			return
@@ -115,6 +160,9 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance) {
 	} else {
 		// Token was not provided in header
 		// Respond back with a failure
+		if p.config.Debug {
+			log.Printf("GitLab Plugin Error: Request received without X-Gitlab-Event-Streaming-Token header")
+		}
 		oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request received without X-Gitlab-Event-Streaming-Token header")
 		http.Error(w, "Authetication Failed", http.StatusUnauthorized )
 		return

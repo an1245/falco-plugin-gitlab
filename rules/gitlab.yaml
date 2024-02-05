@@ -1,0 +1,14 @@
+- rule: GitLab Catch All
+  desc: Catch all rule for 
+  condition: gitlab.created_at contains "20"
+  output: >
+      GitLab Catch All rule: Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, 
+      Created At: %gitlab.created_at, IP Address: %gitlab.ip_address, 
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message,
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
