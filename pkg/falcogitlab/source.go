@@ -79,13 +79,13 @@ func (p *Plugin) Open(params string) (source.Instance, error) {
 	// Work out whether we are using the plugin in a polling or webhook context
 	if p.config.APIOrWebhook == "api" {
 		// Launch the APIClient
-		if p.config.Debug && p.config.DebugLevel >= 0 {
+		if p.config.Debug {
 			log.Printf("GitLab Plugin - Starting API Client Polling")
 		}
 		go fetchAuditAPI(p, oCtx)
 	} else {
 
-		if p.config.Debug && p.config.DebugLevel >= 0 {
+		if p.config.Debug  {
 			log.Printf("GitLab Plugin - Starting Webhook Server")
 		}
 		go webhookServer(p,oCtx)
@@ -207,7 +207,7 @@ func breakOut(backoffcount int, Debug bool, errorMessage string, oCtx *PluginIns
 func fetchAuditAPI(p *Plugin, oCtx *PluginInstance) {
 	backoffcount := 1
 
-	if p.config.Debug && p.config.DebugLevel >= 0 {
+	if p.config.Debug  {
 		log.Printf("GitLab Plugin - Starting Audit Event API requester")
 	}
 	
@@ -219,16 +219,16 @@ outerloop:
 	for {
 
 		// Sleep for the poll interval
-		if p.config.Debug && p.config.DebugLevel >= 1 {
+		if p.config.Debug  {
 			println("Box Plugin: Sleeping for " + fmt.Sprintf("%d", p.config.PollIntervalSecs) + " seconds")
 		}
 		time.Sleep(time.Duration(p.config.PollIntervalSecs) * time.Second)
 		
-		if p.config.Debug && p.config.DebugLevel >= 0 {
+		if p.config.Debug  {
 			println("GitLab Plugin: Authenticating against API")
 		}
 		// Authenticate with GitLab Token
-		git, err := gitlab.NewClient(p.config.GitLabToken, gitlab.WithBaseURL(p.config.GitLabBaseURL))
+		git, err := gitlab.NewOAuthClient(p.config.GitLabToken, gitlab.WithBaseURL(p.config.GitLabBaseURL))
 		if err != nil {
 			errorMessage := "GitLab Plugin ERROR: could not authenticate - check your gitlabtoken and gitlabbaseurl settings in falco.yaml - " + string(err.Error())
 			if breakOut(backoffcount, p.config.Debug, errorMessage, oCtx) {
@@ -307,11 +307,6 @@ outerloop:
 	
 			}
 
-			// Print out the JSON event if Debugging is enabled.
-			if p.config.Debug {
-				println(string(jsonEvent))
-			}
-
 
 			// Send the JSON event through the channel
 			oCtx.whSrvChan <- jsonEvent
@@ -325,7 +320,7 @@ outerloop:
 		
 		
 		// TODO: Do we want to close the GitLab connection here?
-		if p.config.Debug && p.config.DebugLevel >= 1 {
+		if p.config.Debug  {
 			println("GitLab Plugin: Closing GitLab Connection")
 		}
 		

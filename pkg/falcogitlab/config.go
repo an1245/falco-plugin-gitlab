@@ -27,7 +27,7 @@ type PluginConfig struct {
 	ValidationToken   string `json:"ValidationToken" jsonschema:"title=validation token,description=Token for valiating webhook messages"`
 	Debug             bool   `json:"Debug" jsonschema:"title=Enable debug output (true = yes, false=no), default=False"`
 	DebugLevel        int    `json:"DebugLevel" jsonschema:"title=What Debug Level is set (0 through 4), default=0"`
-	PollIntervalSecs  int    `json:"PollIntervalSecs" jsonschema:"title=How often do you want to poll the API?,default=300"`
+	PollIntervalSecs  int    `json:"PollIntervalSecs" jsonschema:"title=How often do you want to poll the API?,required,default=300"`
 }
 
 // Reset sets the configuration to its default values
