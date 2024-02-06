@@ -154,7 +154,7 @@ func (oCtx *PluginInstance) NextBatch(pState sdk.PluginState, evts sdk.EventWrit
 }
 
 type ErrorMessage struct {
-	EventType          string
+	Event_Type         string
 	PluginErrorMessage string
 }
 

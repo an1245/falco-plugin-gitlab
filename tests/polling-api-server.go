@@ -60,6 +60,6 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
         http.HandleFunc("/api/v4/audit_events", apiHandler)
 
-        log.Println("Go!")
+        log.Println("Waiting for new connect on TCP/8080")
         http.ListenAndServe(":8080", nil)
 }

@@ -16,3 +16,13 @@
   priority: WARNING
   source: gitlab
   tags: [gitlab]
+
+
+- rule: GitLab Plugin Error
+  desc: Errors from the GitLab plugin are alerted into Falco also 
+  condition: gitlab.event_type=pluginerror
+  output: >
+    %gitlab.pluginerrormessage
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]

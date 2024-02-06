@@ -114,7 +114,8 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				if err != nil {
 					errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't decode event" )
 					createError(errorMessage,oCtx,p)
-					http.Error(w, err.Error(), http.StatusBadRequest)
+					w.WriteHeader(http.StatusBadRequest)
+					w.Write([]byte("Request Failed"))
 					return
 				}
 				
@@ -125,8 +126,9 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 						// Marshall Event into JSON
 						jsonEvent, err := json.Marshal(tmpFalcoEvent)
 						if err != nil {
-							http.Error(w, err.Error(), http.StatusBadRequest)
-							log.Printf("GitLab Plugin Error: Error marshalling Event to JSON - %v", err)
+							errorMessage := fmt.Sprintf("GitLab Plugin Error: Error marshalling Event to JSON - %v", err)
+							createError(errorMessage,oCtx,p)
+							continue;
 						}
 						
 						oCtx.whSrvChan <- jsonEvent
@@ -144,7 +146,8 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 					log.Printf("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it didn't match configured secret (token provided: %v | token configured: %v)", val, oCtx.whSecret )
 				}
 				oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it didn't match configured secret")
-				http.Error(w, "Authetication Failed", http.StatusUnauthorized )
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte("Authetication Failed"))
 				return
 			}
 		} else {
@@ -154,7 +157,8 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				log.Printf("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it was zero length")
 			}
 			oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it was zero length")
-			http.Error(w, "Authetication Failed", http.StatusUnauthorized )
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("Authetication Failed"))
 			return
 		}
 	} else {
@@ -164,7 +168,8 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 			log.Printf("GitLab Plugin Error: Request received without X-Gitlab-Event-Streaming-Token header")
 		}
 		oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request received without X-Gitlab-Event-Streaming-Token header")
-		http.Error(w, "Authetication Failed", http.StatusUnauthorized )
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Authetication Failed"))
 		return
 	}
 }

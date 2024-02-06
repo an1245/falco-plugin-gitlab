@@ -48,6 +48,7 @@ func (p *Plugin) Fields() []sdk.FieldEntry {
 		{Type: "string", Name: "gitlab.target_id", Display: "GitLab ID of target changed", Desc: "ID of target object that was changed"},
 		{Type: "string", Name: "gitlab.target_type", Display: "GitLab Type of target changed", Desc: "Type of target object that was changed"},
 		{Type: "string", Name: "gitlab.target_details", Display: "GitLab Idetails of change to target", Desc: "Details of the change to the target"},
+		{Type: "string", Name: "gitlab.pluginerrormessage", Display: "Plugin Error Message", Desc: "Plugin Error Message"},
 
 	}
 }
@@ -176,6 +177,8 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 		} else if len(jdata.GetStringBytes("details","target_details")) > 0{
 			res = string(jdata.GetStringBytes("details","target_details"))	
 		}
+	case "gitlab.pluginerrormessage":
+		res = string(jdata.GetStringBytes("PluginErrorMessage"))
 	default:
 		return false, ""
 	}
