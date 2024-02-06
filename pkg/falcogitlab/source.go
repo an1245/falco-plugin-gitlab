@@ -116,7 +116,7 @@ func (oCtx *PluginInstance) NextBatch(pState sdk.PluginState, evts sdk.EventWrit
 	afterCh := time.After(1 * time.Second)
 	select {
 	case gitlabData = <- oCtx.whSrvChan:
-		// Process data from box channel
+		// Process data from GitLab channel
 		
 		written, err := writer.Write(gitlabData)
 		if err != nil {
@@ -220,7 +220,7 @@ outerloop:
 
 		// Sleep for the poll interval
 		if p.config.Debug  {
-			println("Box Plugin: Sleeping for " + fmt.Sprintf("%d", p.config.PollIntervalSecs) + " seconds")
+			println("GitLab Plugin: Sleeping for " + fmt.Sprintf("%d", p.config.PollIntervalSecs) + " seconds")
 		}
 		time.Sleep(time.Duration(p.config.PollIntervalSecs) * time.Second)
 		
