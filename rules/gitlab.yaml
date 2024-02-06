@@ -5,7 +5,7 @@
       GitLab Catch All rule: 
       -------------------------------------------------------------------------------------------
       Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
-      IP Address: %gitlab.ip_address, 
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
       Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
       Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
       Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
@@ -16,7 +16,6 @@
   priority: WARNING
   source: gitlab
   tags: [gitlab]
-
 
 - rule: GitLab Plugin Error
   desc: Errors from the GitLab plugin are alerted into Falco also 

@@ -28,7 +28,7 @@ import (
 
 	"github.com/falcosecurity/plugin-sdk-go/pkg/sdk"
 	"github.com/falcosecurity/plugin-sdk-go/pkg/sdk/plugins/source"
-	//"github.com/oschwald/geoip2-golang"
+	"github.com/oschwald/geoip2-golang"
 
 	"github.com/xanzy/go-gitlab"
 	
@@ -52,6 +52,42 @@ func (p *Plugin) initInstance(oCtx *PluginInstance) error {
 	oCtx.whSecret = p.config.ValidationToken
 	oCtx.whSrvChan = nil
 	oCtx.whSrvErrorChan = nil
+
+	// Start: Open Maxmind Geo DB
+	oCtx.checkGeoDB = false
+
+	if len(p.config.MaxmindCityDBPath) > 0 {
+		if _, err := os.Stat(p.config.MaxmindCityDBPath); err == nil {
+			tempgeodb, err2 := geoip2.Open(p.config.MaxmindCityDBPath)
+			if err2 != nil {
+				oCtx.checkGeoDB = false
+				if p.config.Debug {
+					println("GitLab Plugin: Located Maxmind DB at path at MaxmindCityDBPath, but couldn't open it. Disabling GeoDB enrichment")
+				}
+			} else {
+				oCtx.checkGeoDB = true
+				oCtx.geodb = *tempgeodb
+				if p.config.Debug {
+					println("GitLab Plugin: Found Maxmind GeoDB and opened it successfully - enabling GeoDB enrichment")
+				}
+
+			}
+
+		} else {
+			if p.config.Debug {
+				println("GitLab Plugin: Could not locate Maxmind DB as specified in MaxmindCityDBPath in falco.yaml. Disabling GeoDB enrichment")
+			}
+		}
+
+	} else {
+		if p.config.Debug {
+			println("GitLab Plugin: MaxmindCityDBPath config setting was blank in falco.yaml. Disabling GeoDB enrichment")
+		}
+	}
+	// End: Open Maxmind Geo DB
+
+
+
 	return nil
 
 }
@@ -272,9 +308,8 @@ outerloop:
 
 			// If Geolocation enrichment is enabled then enrich the IP with Geolocation info
 			// Start Geolocation Enrichment
-			checkGeoDB := false
 
-			if checkGeoDB && len(ipstr) > 0 {
+			if oCtx.checkGeoDB && len(ipstr) > 0 {
 				ip := net.ParseIP(ipstr)
 				if ip != nil {
 					city, err := oCtx.geodb.City(ip)

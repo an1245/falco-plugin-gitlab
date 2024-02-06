@@ -51,7 +51,8 @@ type Plugin struct {
 // which is returned by Open() and deinitialized during Close().
 type PluginInstance struct {
 	source.BaseInstance
-	geodb      geoip2.Reader
+	geodb       geoip2.Reader
+	checkGeoDB  bool
 	whSrv      *http.Server
 	whSrvChan      chan []byte
 	whSrvErrorChan chan []byte

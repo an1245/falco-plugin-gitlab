@@ -35,6 +35,10 @@ func (p *Plugin) Fields() []sdk.FieldEntry {
 		{Type: "string", Name: "gitlab.author_email", Display: "GitLab Author Email", Desc: "What was the email of the user that made the change"},
 		{Type: "string", Name: "gitlab.author_class", Display: "GitLab Author Class", Desc: "What class of author made the change"},
 		{Type: "string", Name: "gitlab.custom_message", Display: "GitLab Custom Audit Message", Desc: "Contents of a GitLab Custom Message"},
+		{Type: "string", Name: "gitlab.city", Display: "City", Desc: "The city where the user’s IP address is physically located"},
+		{Type: "string", Name: "gitlab.country", Display: "Country", Desc: "The country where the user’s IP address is physically located"},
+		{Type: "string", Name: "gitlab.countryisocode", Display: "Country ISO Code", Desc: "The country iso code where the user’s IP address is physically located"},
+		{Type: "string", Name: "gitlab.continent", Display: "Continent", Desc: "The continent where the user’s IP address is physically located"},
 		{Type: "string", Name: "gitlab.entity_id", Display: "GitLab Entity ID", Desc: "What was the ID of the entity that was changed"},
 		{Type: "string", Name: "gitlab.entity_type", Display: "GitLab Entity Type", Desc: "What type of entity was changed"},
 		{Type: "string", Name: "gitlab.entity_path", Display: "GitLab Entity Path", Desc: "What was the path of the entity that was changed"},
@@ -91,6 +95,14 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 		} else if len(jdata.GetStringBytes("details","custom_message")) > 0{
 			res = string(jdata.GetStringBytes("details","custom_message"))	
 		}
+	case "gitlab.city":
+		res = string(jdata.GetStringBytes("City"))
+	case "gitlab.country":
+		res = string(jdata.GetStringBytes("Country"))
+	case "gitlab.countryisocode":
+		res = string(jdata.GetStringBytes("CountryIsoCode"))
+	case "gitlab.continent":
+		res = string(jdata.GetStringBytes("Continent"))
 	case "gitlab.entity_id":
 		if jdata.GetInt("entity_id") > 0 {
 			res = fmt.Sprintf("%v", jdata.GetInt("entity_id"))
@@ -114,11 +126,11 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 	case "gitlab.created_at":
 		res = string(jdata.GetStringBytes("created_at"))
 	case "gitlab.ip_address":
-		if len(jdata.GetStringBytes("ip_address")) > 0 {
-			res = string(jdata.GetStringBytes("ip_address"))
-		} else if len(jdata.GetStringBytes("details","ip_address")) > 0{
+		if len(jdata.GetStringBytes("details","ip_address")) > 0{
 			res = string(jdata.GetStringBytes("details","ip_address"))	
-		}
+		} else if len(jdata.GetStringBytes("ip_address")) > 0 {
+			res = string(jdata.GetStringBytes("ip_address"))
+		} 
 	case "gitlab.op_type":
 		// check whether add, change,  remove
 		if len(jdata.GetStringBytes("details","add")) > 0 {

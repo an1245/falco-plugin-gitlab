@@ -20,11 +20,13 @@ import (
 	"fmt"
 	"net/http"
 	"log"
+	"net"
 	"os"
 	"errors"
 	"github.com/xanzy/go-gitlab"
 	"encoding/json"
 	"strings"
+	//"github.com/oschwald/geoip2-golang"
 
 )
 
@@ -122,6 +124,35 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				for i := range event {
 
 						tmpFalcoEvent := FalcoEvent{GitLabEvent:&event[i]}
+
+						// Check if the IP exists
+						ipstr := event[i].Details.IPAddress
+						if strings.Contains(ipstr, ",") {
+							stringSlice := strings.Split(ipstr, ",")
+							ipstr = stringSlice[0]
+						}
+
+
+						// If Geolocation enrichment is enabled then enrich the IP with Geolocation info
+						// Start Geolocation Enrichment
+						if oCtx.checkGeoDB && len(ipstr) > 0 {
+							ip := net.ParseIP(ipstr)
+							if ip != nil {
+								city, err := oCtx.geodb.City(ip)
+								if err != nil {
+									if p.config.Debug  {
+										println("GitLab Plugin WARNING: fetchAuditAPI: couldn't get City() for ip: " + ipstr)
+									}
+								}
+								
+								tmpFalcoEvent.City = city.City.Names["en"]
+								tmpFalcoEvent.Country = city.Country.Names["en"]
+								tmpFalcoEvent.CountryIsoCode = city.Country.IsoCode
+								tmpFalcoEvent.Continent = city.Continent.Names["en"]
+							}
+
+						} 
+						// End Geolocation Enrichment													
 				
 						// Marshall Event into JSON
 						jsonEvent, err := json.Marshal(tmpFalcoEvent)
