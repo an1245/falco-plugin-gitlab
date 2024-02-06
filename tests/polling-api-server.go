@@ -11,6 +11,9 @@ import (
 func apiHandler(w http.ResponseWriter, r *http.Request) {
         println("Handling new stream")
         stream, err := ioutil.ReadFile("./gitlab-event.txt")
+        if err != nil {
+		println("GitLab Polling API Server: Couldn't read gitlab-event.txt")
+	}
         b := bytes.NewBuffer(stream)
         
         switch r.Method {
@@ -53,7 +56,8 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
                 }
                 
         default:
-                http.Error(w, err.Error(), http.StatusMethodNotAllowed)
+                w.WriteHeader(http.StatusMethodNotAllowed)
+                w.Write([]byte("Method Not Allowed"))
         }
 }
 
