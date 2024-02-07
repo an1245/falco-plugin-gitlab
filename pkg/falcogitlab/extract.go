@@ -62,7 +62,18 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 
 	switch field {
 	case "gitlab.event_id":
-		res = fmt.Sprintf("%v", jdata.GetInt("id"))
+		if jdata.Exists("id") {
+			valueType := jdata.Get("id").Type()
+			if valueType == fastjson.TypeNumber {
+				if jdata.GetInt("id") > 0 {
+					res = fmt.Sprintf("%v",jdata.GetInt("id"))
+				} 
+			} else if valueType == fastjson.TypeString  {
+				if len(jdata.GetStringBytes("id")) > 0 {
+					res = string(jdata.GetStringBytes("id"))
+				}
+			}
+		} 
 	case "gitlab.event_type":
 		res = string(jdata.GetStringBytes("event_type"))
 	case "gitlab.author_id":
