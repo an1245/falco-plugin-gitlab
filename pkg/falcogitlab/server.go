@@ -116,6 +116,7 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				err := json.NewDecoder(r.Body).Decode(&event)
 				if err != nil {
 					errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't decode event" )
+					createError(errorMessage,oCtx,p)
 					if p.config.Debug {
 						res, err := httputil.DumpRequest(r, true)  
 						if err != nil {  
@@ -135,7 +136,7 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 
 						}
 					}
-					createError(errorMessage,oCtx,p)
+					
 					w.WriteHeader(http.StatusBadRequest)
 					w.Write([]byte("Request Failed"))
 					return
