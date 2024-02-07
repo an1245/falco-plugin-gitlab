@@ -141,7 +141,7 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 								city, err := oCtx.geodb.City(ip)
 								if err != nil {
 									if p.config.Debug  {
-										println("GitLab Plugin WARNING: fetchAuditAPI: couldn't get City() for ip: " + ipstr)
+										log.Printf("GitLab Plugin WARNING: fetchAuditAPI: couldn't get City() for ip: " + ipstr)
 									}
 								}
 								
@@ -149,6 +149,8 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 								tmpFalcoEvent.Country = city.Country.Names["en"]
 								tmpFalcoEvent.CountryIsoCode = city.Country.IsoCode
 								tmpFalcoEvent.Continent = city.Continent.Names["en"]
+							} else {
+								log.Printf("GitLab Plugin WARNING: handleHook: Couldn't parse IP: " + ipstr)
 							}
 
 						} 

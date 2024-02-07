@@ -323,6 +323,8 @@ outerloop:
 					tmpFalcoEvent.Country = city.Country.Names["en"]
 					tmpFalcoEvent.CountryIsoCode = city.Country.IsoCode
 					tmpFalcoEvent.Continent = city.Continent.Names["en"]
+				} else {
+					log.Printf("GitLab Plugin WARNING: fetchAuditAPI: Couldn't parse IP: " + ipstr)
 				}
 
 			} 
