@@ -19,9 +19,9 @@ package falcogitlab
 import (
 	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"log"
 	"net"
-	"io/ioutil"
 	"os"
 	"errors"
 	"github.com/xanzy/go-gitlab"
@@ -117,12 +117,12 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				if err != nil {
 					errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't decode event" )
 					if p.config.Debug {
-						bodyBytes, err := ioutil.ReadAll(r.Body)
-						if err != nil {
-							log.Printf("GitLab Plugin Error: Couldn't read request body using ioutil")
-						}
-						bodyString := string(bodyBytes)
-						log.Printf("GitLab Plugin Error: JSON REQUEST:\n%s", bodyString)
+						res, err := httputil.DumpRequest(r, true)  
+						if err != nil {  
+							log.Printf("GitLab Plugin Error: Couldn't dump request")  
+						}  
+			
+						log.Printf("GitLab Plugin Error: HTTP REQUEST:%v", string(res))
 					}
 					createError(errorMessage,oCtx,p)
 					w.WriteHeader(http.StatusBadRequest)
