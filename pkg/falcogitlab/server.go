@@ -19,7 +19,7 @@ package falcogitlab
 import (
 	"fmt"
 	"net/http"
-	//"net/http/httputil"
+	"net/http/httputil"
 	"log"
 	"net"
 	"os"
@@ -117,12 +117,13 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				if err != nil {
 					errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't decode event" )
 					if p.config.Debug {
-						//res, err := httputil.DumpRequest(r, true)  
-						//if err != nil {  
-						//	log.Printf("GitLab Plugin Error: Couldn't dump request")  
-						//}  
+						res, err := httputil.DumpRequest(r, true)  
+						if err != nil {  
+							log.Printf("GitLab Plugin Error: Couldn't dump request")  
+						}  
 			
-						log.Printf("GitLab Plugin Error: HTTP REQUEST")
+						log.Printf("GitLab Plugin Error: HTTP REQUEST - %v",string(res))
+						log.Printf("GitLab Plugin Error: Form Variables")
 						for key, value := range r.Form {
 							log.Printf("-- %s = %s", key, value)
 
