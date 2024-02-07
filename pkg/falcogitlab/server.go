@@ -151,8 +151,6 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				
 					tmpFalcoEvent := FalcoStreamingEvent{AuditEvent:&event}
 					
-					tmpFalcoEventType, _ := headers["X-Gitlab-Audit-Event-Type"]
-					tmpFalcoEvent.EventType = strings.Join(tmpFalcoEventType,"")
 
 					// Check if the IP exists
 					ipstr := event.Details.IPAddress
@@ -278,7 +276,6 @@ type AuditEventDetails struct {
 }
 
 type FalcoStreamingEvent struct {
-    EventType string
 	City string
 	Country string
 	CountryIsoCode string
