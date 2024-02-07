@@ -24,9 +24,10 @@ import (
 	"net"
 	"os"
 	"errors"
-	"github.com/xanzy/go-gitlab"
+	//"github.com/xanzy/go-gitlab"
 	"encoding/json"
 	"strings"
+	"time"
 	//"github.com/oschwald/geoip2-golang"
 
 )
@@ -104,7 +105,7 @@ func webhookServer(p *Plugin, oCtx *PluginInstance){
 
 func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p *Plugin) {
 	
-	event := gitlab.AuditEvent{}
+	event := AuditEvent{}
 	
 	headers := r.Header
 	val, ok := headers["X-Gitlab-Event-Streaming-Token"]
@@ -148,7 +149,7 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 						return
 					}
 				
-					tmpFalcoEvent := FalcoEvent{GitLabEvent:&event}
+					tmpFalcoEvent := FalcoStreamingEvent{AuditEvent:&event}
 					
 					tmpFalcoEventType, _ := headers["X-Gitlab-Audit-Event-Type"]
 					tmpFalcoEvent.EventType = strings.Join(tmpFalcoEventType,"")
@@ -246,3 +247,41 @@ func fileExists(fname string) bool {
 	return true
 }
 
+type AuditEvent struct {
+	ID         string            `json:"id"`
+	AuthorID   int               `json:"author_id"`
+	EntityID   int               `json:"entity_id"`
+	EntityType string            `json:"entity_type"`
+	Details    AuditEventDetails `json:"details"`
+	CreatedAt  *time.Time        `json:"created_at"`
+	EventType  string 	    	 `json:"event_type"`
+}
+
+type AuditEventDetails struct {
+	With          string      `json:"with"`
+	Add           string      `json:"add"`
+	As            string      `json:"as"`
+	Change        string      `json:"change"`
+	From          string      `json:"from"`
+	To            string      `json:"to"`
+	Remove        string      `json:"remove"`
+	CustomMessage string      `json:"custom_message"`
+	AuthorName    string      `json:"author_name"`
+	AuthorEmail   string      `json:"author_email"`
+	AuthorClass   string      `json:"author_class"`
+	TargetID      interface{} `json:"target_id"`
+	TargetType    string      `json:"target_type"`
+	TargetDetails string      `json:"target_details"`
+	IPAddress     string      `json:"ip_address"`
+	EntityPath    string      `json:"entity_path"`
+	FailedLogin   string      `json:"failed_login"`
+}
+
+type FalcoStreamingEvent struct {
+    EventType string
+	City string
+	Country string
+	CountryIsoCode string
+	Continent string
+    *AuditEvent
+}
