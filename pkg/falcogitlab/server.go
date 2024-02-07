@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"log"
 	"net"
+	"io/ioutil"
 	"os"
 	"errors"
 	"github.com/xanzy/go-gitlab"
@@ -115,6 +116,14 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				err := json.NewDecoder(r.Body).Decode(&event)
 				if err != nil {
 					errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't decode event" )
+					if p.config.Debug {
+						bodyBytes, err := ioutil.ReadAll(r.Body)
+						if err != nil {
+							log.Printf("GitLab Plugin Error: Couldn't read request body using ioutil")
+						}
+						bodyString := string(bodyBytes)
+						log.Printf("GitLab Plugin Error: JSON REQUEST:\n%s", bodyString)
+					}
 					createError(errorMessage,oCtx,p)
 					w.WriteHeader(http.StatusBadRequest)
 					w.Write([]byte("Request Failed"))
