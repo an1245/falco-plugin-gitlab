@@ -123,6 +123,12 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 						}  
 			
 						log.Printf("GitLab Plugin Error: HTTP REQUEST - %v",string(res))
+						log.Printf("GitLab Plugin Error: Post Form Variables")
+						r.ParseForm()
+						for key, value := range r.PostForm {
+							log.Printf("-- %s = %s", key, value)
+
+						}
 						log.Printf("GitLab Plugin Error: Form Variables")
 						for key, value := range r.Form {
 							log.Printf("-- %s = %s", key, value)
