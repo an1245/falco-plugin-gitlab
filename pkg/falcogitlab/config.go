@@ -17,7 +17,6 @@ limitations under the License.
 package falcogitlab
 
 // PluginConfig represents a configuration of the GitHub plugin
-// https://go.dev/play/p/XWmiewe68pW
 type PluginConfig struct {
 	APIOrWebhook      string `json:"APIOrWebhook" jsonschema:"title=api or webhook?,required,default=webhook,pattern=^(api|webhook)$"`
 	GitLabToken       string `json:"GitLabToken" jsonschema:"title=GitLab Token,required"`
