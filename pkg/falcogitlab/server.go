@@ -265,7 +265,7 @@ type AuditEventDetails struct {
 	From          string      `json:"from"`
 	To            string      `json:"to"`
 	Remove        string      `json:"remove"`
-	CustomMessage string      `json:"custom_message"`
+	CustomMessage interface{} `json:"custom_message"`
 	AuthorName    string      `json:"author_name"`
 	AuthorEmail   string      `json:"author_email"`
 	AuthorClass   string      `json:"author_class"`
