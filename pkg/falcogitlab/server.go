@@ -113,7 +113,8 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 		if len(tmpGitLabToken) > 0 {
 			if tmpGitLabToken == oCtx.whSecret {
 				// Token passed authentication
-				err := json.NewDecoder(r.Body).Decode(&event)
+				r.ParseForm()
+				err := json.NewDecoder(r.PostForm).Decode(&event)
 				if err != nil {
 					errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't decode event" )
 					createError(errorMessage,oCtx,p)
@@ -125,7 +126,7 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 			
 						log.Printf("GitLab Plugin Error: HTTP REQUEST - %v",string(res))
 						log.Printf("GitLab Plugin Error: Post Form Variables")
-						r.ParseForm()
+						
 						for key, value := range r.PostForm {
 							log.Printf("-- %s = %s", key, value)
 
