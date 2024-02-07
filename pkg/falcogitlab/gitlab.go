@@ -26,6 +26,7 @@ import (
 	"github.com/oschwald/geoip2-golang"
 	"github.com/valyala/fastjson"
 	"net/http"
+	//"log"
 )
 
 const (
@@ -78,7 +79,9 @@ func (p *Plugin) InitSchema() *sdk.SchemaInfo {
 		AllowAdditionalProperties:  true,  // unrecognized properties don't cause a parsing failures
 	}
 
+	
 	if schema, err := reflector.Reflect(&PluginConfig{}).MarshalJSON(); err == nil {
+		//log.Printf("GitLab Plugin: Config Schema=" + string(schema))
 		return &sdk.SchemaInfo{
 			Schema: string(schema),
 		}

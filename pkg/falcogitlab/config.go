@@ -17,18 +17,19 @@ limitations under the License.
 package falcogitlab
 
 // PluginConfig represents a configuration of the GitHub plugin
+// https://go.dev/play/p/XWmiewe68pW
 type PluginConfig struct {
-	APIOrWebhook	  string `json:"APIOrWebhook" jsonschema:"title=API or Webhook?,required,default=webhook"`
+	APIOrWebhook      string `json:"APIOrWebhook" jsonschema:"title=api or webhook?,required,default=webhook,pattern=^(api|webhook)$"`
 	GitLabToken       string `json:"GitLabToken" jsonschema:"title=GitLab Token,required"`
-	GitLabBaseURL     string `json:"GitLabBaseURL" jsonschema:"title=GitLab Base URL (default: https://gitlab.com/),default=https://gitlab.com/,format=uri"`
-	MaxmindCityDBPath string `json:"maxmindcitydbpath" jsonschema:"title=Path to Maxmind GeoLite2 or GeoIP2 City Database"`
-	SecretsDir        string `json:"secretsDir" jsonschema:"title=Secrets directory,description=The directory where the secrets required by the plugin are stored. Unless the github token is provided by environment variable, it must be stored in a file named github.token in this directory. In addition, when the webhook server uses HTTPs, server.key and server.crt must be in this directory too."`
-	UseHTTPs          bool   `json:"UseHTTPs" jsonschema:"title=Use HTTPS,description=if this parameter is set to true, then the webhook webserver listening at WebsocketServerURL will use HTTPS. In that case, server.key and server.crt must be present in the secrets directory, or the plugin will fail to load. If the parameter is set to false, the webhook webserver will be plain HTTP. Use HTTP only for testing or when the plugin is behind a proxy that handles encryption."`
-	ValidationToken   string `json:"ValidationToken" jsonschema:"title=validation token,description=Token for valiating webhook messages"`
-	Debug             bool   `json:"Debug" jsonschema:"title=Enable debug output (true = yes, false=no), default=False"`
-	DebugLevel        int    `json:"DebugLevel" jsonschema:"title=What Debug Level is set (0 through 4), default=0"`
+	GitLabBaseURL     string `json:"GitLabBaseURL" jsonschema:"title=GitLab Base URL (default: https://gitlab.com/),required,default=https://gitlab.com/,format=uri"`
+	MaxmindCityDBPath string `json:"MaxmindCityDBPath" jsonschema:"title=Path to Maxmind GeoLite2 or GeoIP2 City Database,required"`
+	SecretsDir        string `json:"SecretsDir" jsonschema:"title=Secrets directory,required"`
+	UseHTTPs          bool   `json:"UseHTTPS" jsonschema:"title=Use HTTPS,required"`
+	ValidationToken   string `json:"ValidationToken" jsonschema:"title=validation token,required"`
+	Debug             bool   `json:"Debug" jsonschema:"title=Enable debug output (true = yes, false=no), required, default=False"`
 	PollIntervalSecs  int    `json:"PollIntervalSecs" jsonschema:"title=How often do you want to poll the API?,required,default=300"`
 }
+
 
 // Reset sets the configuration to its default values
 func (p *PluginConfig) Reset() {

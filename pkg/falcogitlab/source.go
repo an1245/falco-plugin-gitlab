@@ -62,26 +62,26 @@ func (p *Plugin) initInstance(oCtx *PluginInstance) error {
 			if err2 != nil {
 				oCtx.checkGeoDB = false
 				if p.config.Debug {
-					println("GitLab Plugin: Located Maxmind DB at path at MaxmindCityDBPath, but couldn't open it. Disabling GeoDB enrichment")
+					log.Printf("GitLab Plugin: Located Maxmind DB at path at MaxmindCityDBPath, but couldn't open it. Disabling GeoDB enrichment")
 				}
 			} else {
 				oCtx.checkGeoDB = true
 				oCtx.geodb = *tempgeodb
 				if p.config.Debug {
-					println("GitLab Plugin: Found Maxmind GeoDB and opened it successfully - enabling GeoDB enrichment")
+					log.Printf("GitLab Plugin: Found Maxmind GeoDB and opened it successfully - enabling GeoDB enrichment")
 				}
 
 			}
 
 		} else {
 			if p.config.Debug {
-				println("GitLab Plugin: Could not locate Maxmind DB as specified in MaxmindCityDBPath in falco.yaml. Disabling GeoDB enrichment")
+				log.Printf("GitLab Plugin: Could not locate Maxmind DB as specified in MaxmindCityDBPath in falco.yaml. Disabling GeoDB enrichment")
 			}
 		}
 
 	} else {
 		if p.config.Debug {
-			println("GitLab Plugin: MaxmindCityDBPath config setting was blank in falco.yaml. Disabling GeoDB enrichment")
+			log.Printf("GitLab Plugin: MaxmindCityDBPath config setting was blank in falco.yaml. Disabling GeoDB enrichment")
 		}
 	}
 	// End: Open Maxmind Geo DB
@@ -105,7 +105,7 @@ func (p *Plugin) Open(params string) (source.Instance, error) {
 	}
 
 	if p.config.Debug {
-		log.Printf("GitLab Plugin: Debug logging is enabled at Debug Level: " + fmt.Sprintf("%d", p.config.DebugLevel))
+		log.Printf("GitLab Plugin: Debug logging is enabled")
 	}
 
 	// Create the channels
@@ -256,12 +256,12 @@ outerloop:
 
 		// Sleep for the poll interval
 		if p.config.Debug  {
-			println("GitLab Plugin: Sleeping for " + fmt.Sprintf("%d", p.config.PollIntervalSecs) + " seconds")
+			log.Printf("GitLab Plugin: Sleeping for " + fmt.Sprintf("%d", p.config.PollIntervalSecs) + " seconds")
 		}
 		time.Sleep(time.Duration(p.config.PollIntervalSecs) * time.Second)
 		
 		if p.config.Debug  {
-			println("GitLab Plugin: Authenticating against API")
+			log.Printf("GitLab Plugin: Authenticating against API")
 		}
 		// Authenticate with GitLab Token
 		git, err := gitlab.NewOAuthClient(p.config.GitLabToken, gitlab.WithBaseURL(p.config.GitLabBaseURL))
