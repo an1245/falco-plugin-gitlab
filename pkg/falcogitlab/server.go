@@ -104,7 +104,7 @@ func webhookServer(p *Plugin, oCtx *PluginInstance){
 
 func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p *Plugin) {
 	
-	event := []gitlab.AuditEvent{}
+	event := gitlab.AuditEvent{}
 	
 	headers := r.Header
 	val, ok := headers["X-Gitlab-Event-Streaming-Token"]
@@ -114,87 +114,90 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 			if tmpGitLabToken == oCtx.whSecret {
 				// Token passed authentication
 				r.ParseForm()
-				err := json.NewDecoder(r.Body).Decode(&event)
-				if err != nil {
-					errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't decode event" )
-					createError(errorMessage,oCtx,p)
-					if p.config.Debug {
-						res, err := httputil.DumpRequest(r, true)  
-						if err != nil {  
-							log.Printf("GitLab Plugin Error: Couldn't dump request")  
-						}  
+
+				for key, value := range r.Form {
+					eventjson := []byte(key)
+					err := json.Unmarshal(eventjson,&event)
+					if err != nil {
+						errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't unmarshal event: %s", err )
+						createError(errorMessage,oCtx,p)
+						if p.config.Debug {
+							res, err := httputil.DumpRequest(r, true)  
+							if err != nil {  
+								log.Printf("GitLab Plugin Error: Couldn't dump request")  
+							}  
+				
+							log.Printf("GitLab Plugin Error: HTTP REQUEST - %v",string(res))
+							log.Printf("GitLab Plugin Error: Post Form Variables")
+							
+							for key, value := range r.PostForm {
+								log.Printf("-- %s = %s", key, value)
+
+							}
+							log.Printf("GitLab Plugin Error: Form Variables")
+							
+								log.Printf("-- %s = %s", key, value)
+
+							
+						}
+					
+				
+						w.WriteHeader(http.StatusBadRequest)
+						w.Write([]byte("Request Failed"))
+						return
+					}
+				
+					tmpFalcoEvent := FalcoEvent{GitLabEvent:&event}
+					
+					tmpFalcoEventType, _ := headers["X-Gitlab-Audit-Event-Type"]
+					tmpFalcoEvent.EventType = strings.Join(tmpFalcoEventType,"")
+
+					// Check if the IP exists
+					ipstr := event.Details.IPAddress
+					if strings.Contains(ipstr, ",") {
+						stringSlice := strings.Split(ipstr, ",")
+						ipstr = stringSlice[0]
+					}
+
+
+					// If Geolocation enrichment is enabled then enrich the IP with Geolocation info
+					// Start Geolocation Enrichment
+					if oCtx.checkGeoDB && len(ipstr) > 0 {
+						ip := net.ParseIP(ipstr)
+						if ip != nil {
+							city, err := oCtx.geodb.City(ip)
+							if err != nil {
+								if p.config.Debug  {
+									log.Printf("GitLab Plugin WARNING: fetchAuditAPI: couldn't get City() for ip: " + ipstr)
+								}
+							}
+							
+							tmpFalcoEvent.City = city.City.Names["en"]
+							tmpFalcoEvent.Country = city.Country.Names["en"]
+							tmpFalcoEvent.CountryIsoCode = city.Country.IsoCode
+							tmpFalcoEvent.Continent = city.Continent.Names["en"]
+						} else {
+							log.Printf("GitLab Plugin WARNING: handleHook: Couldn't parse IP: " + ipstr)
+						}
+
+					} 
+					// End Geolocation Enrichment													
 			
-						log.Printf("GitLab Plugin Error: HTTP REQUEST - %v",string(res))
-						log.Printf("GitLab Plugin Error: Post Form Variables")
-						
-						for key, value := range r.PostForm {
-							log.Printf("-- %s = %s", key, value)
-
-						}
-						log.Printf("GitLab Plugin Error: Form Variables")
-						for key, value := range r.Form {
-							log.Printf("-- %s = %s", key, value)
-
-						}
+					// Marshall Event into JSON
+					jsonEvent, err := json.Marshal(tmpFalcoEvent)
+					if err != nil {
+						errorMessage := fmt.Sprintf("GitLab Plugin Error: Error marshalling Event to JSON - %v", err)
+						createError(errorMessage,oCtx,p)
+						continue;
 					}
 					
-					w.WriteHeader(http.StatusBadRequest)
-					w.Write([]byte("Request Failed"))
+					oCtx.whSrvChan <- jsonEvent
+						
+
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte("Request Successful"))
 					return
 				}
-				
-				for i := range event {
-
-						tmpFalcoEvent := FalcoEvent{GitLabEvent:&event[i]}
-						
-						tmpFalcoEventType, _ := headers["X-Gitlab-Audit-Event-Type"]
-						tmpFalcoEvent.EventType = strings.Join(tmpFalcoEventType,"")
-
-						// Check if the IP exists
-						ipstr := event[i].Details.IPAddress
-						if strings.Contains(ipstr, ",") {
-							stringSlice := strings.Split(ipstr, ",")
-							ipstr = stringSlice[0]
-						}
-
-
-						// If Geolocation enrichment is enabled then enrich the IP with Geolocation info
-						// Start Geolocation Enrichment
-						if oCtx.checkGeoDB && len(ipstr) > 0 {
-							ip := net.ParseIP(ipstr)
-							if ip != nil {
-								city, err := oCtx.geodb.City(ip)
-								if err != nil {
-									if p.config.Debug  {
-										log.Printf("GitLab Plugin WARNING: fetchAuditAPI: couldn't get City() for ip: " + ipstr)
-									}
-								}
-								
-								tmpFalcoEvent.City = city.City.Names["en"]
-								tmpFalcoEvent.Country = city.Country.Names["en"]
-								tmpFalcoEvent.CountryIsoCode = city.Country.IsoCode
-								tmpFalcoEvent.Continent = city.Continent.Names["en"]
-							} else {
-								log.Printf("GitLab Plugin WARNING: handleHook: Couldn't parse IP: " + ipstr)
-							}
-
-						} 
-						// End Geolocation Enrichment													
-				
-						// Marshall Event into JSON
-						jsonEvent, err := json.Marshal(tmpFalcoEvent)
-						if err != nil {
-							errorMessage := fmt.Sprintf("GitLab Plugin Error: Error marshalling Event to JSON - %v", err)
-							createError(errorMessage,oCtx,p)
-							continue;
-						}
-						
-						oCtx.whSrvChan <- jsonEvent
-					}
-
-				w.WriteHeader(http.StatusOK)
-				w.Write([]byte("Request Successful"))
-				return
 
 
 			} else {
