@@ -117,6 +117,7 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 
 				for key, value := range r.Form {
 					eventjson := []byte(key)
+					println(string(eventjson))
 					err := json.Unmarshal(eventjson,&event)
 					if err != nil {
 						errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't unmarshal event: %s", err )
