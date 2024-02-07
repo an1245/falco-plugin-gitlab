@@ -37,7 +37,8 @@ import (
 type GitLabEvent = gitlab.AuditEvent
 
 type FalcoEvent struct {
-    City string
+    EventType string
+	City string
 	Country string
 	CountryIsoCode string
 	Continent string
@@ -298,7 +299,7 @@ outerloop:
 		for i := len(eventsArray)-1; i >=0; i-- {
 		
 			tmpFalcoEvent := FalcoEvent{GitLabEvent:eventsArray[i]}
-			
+			  
 			// Check if the IP exists
 			ipstr := eventsArray[i].Details.IPAddress
 			if strings.Contains(ipstr, ",") {

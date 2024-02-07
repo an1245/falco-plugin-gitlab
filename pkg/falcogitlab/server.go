@@ -19,7 +19,7 @@ package falcogitlab
 import (
 	"fmt"
 	"net/http"
-	"net/http/httputil"
+	//"net/http/httputil"
 	"log"
 	"net"
 	"os"
@@ -117,12 +117,16 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				if err != nil {
 					errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't decode event" )
 					if p.config.Debug {
-						res, err := httputil.DumpRequest(r, true)  
-						if err != nil {  
-							log.Printf("GitLab Plugin Error: Couldn't dump request")  
-						}  
+						//res, err := httputil.DumpRequest(r, true)  
+						//if err != nil {  
+						//	log.Printf("GitLab Plugin Error: Couldn't dump request")  
+						//}  
 			
-						log.Printf("GitLab Plugin Error: HTTP REQUEST:%v", string(res))
+						log.Printf("GitLab Plugin Error: HTTP REQUEST")
+						for key, value := range r.Form {
+							log.Printf("-- %s = %s", key, value)
+
+						}
 					}
 					createError(errorMessage,oCtx,p)
 					w.WriteHeader(http.StatusBadRequest)
@@ -133,6 +137,9 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				for i := range event {
 
 						tmpFalcoEvent := FalcoEvent{GitLabEvent:&event[i]}
+						
+						tmpFalcoEventType, _ := headers["X-Gitlab-Audit-Event-Type"]
+						tmpFalcoEvent.EventType = strings.Join(tmpFalcoEventType,"")
 
 						// Check if the IP exists
 						ipstr := event[i].Details.IPAddress
