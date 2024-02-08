@@ -246,9 +246,9 @@ func fileExists(fname string) bool {
 }
 
 type AuditEvent struct {
-	ID         string            `json:"id"`
-	AuthorID   int               `json:"author_id"`
-	EntityID   int               `json:"entity_id"`
+	ID         interface{}       `json:"id"`
+	AuthorID   interface{}       `json:"author_id"`
+	EntityID   interface{}       `json:"entity_id"`
 	EntityType string            `json:"entity_type"`
 	Details    AuditEventDetails `json:"details"`
 	CreatedAt  *time.Time        `json:"created_at"`

@@ -77,10 +77,29 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 	case "gitlab.event_type":
 		res = string(jdata.GetStringBytes("event_type"))
 	case "gitlab.author_id":
-		if jdata.GetInt("author_id") > 0 {
-			res = fmt.Sprintf("%v", jdata.GetInt("author_id"))
-		} else if jdata.GetInt("details","author_id") > 0 {
-			res = fmt.Sprintf("%v", jdata.GetInt("details","author_id"))	
+		if jdata.Exists("author_id") {
+			valueType := jdata.Get("author_id").Type()
+			if valueType == fastjson.TypeNumber {
+				if jdata.GetInt("author_id") > 0 {
+					res = fmt.Sprintf("%v",jdata.GetInt("author_id"))
+				} 
+			} else if valueType == fastjson.TypeString  {
+				if len(jdata.GetStringBytes("author_id")) > 0 {
+					res = string(jdata.GetStringBytes("author_id"))
+				}
+			}
+		} else if jdata.Exists("details", "author_id") {
+			valueType := jdata.Get("details", "author_id").Type()
+			if valueType == fastjson.TypeNumber {
+				if jdata.GetInt("details","author_id") > 0 {
+					res = fmt.Sprintf("%v",jdata.GetInt("details","author_id"))
+				} 
+			} else if valueType == fastjson.TypeString  {
+				if len(jdata.GetStringBytes("details","author_id")) > 0 {
+					res = string(jdata.GetStringBytes("details","author_id"))
+				}
+			}
+
 		}
 	case "gitlab.author_name":
 		if len(jdata.GetStringBytes("author_name")) > 0 {
@@ -115,10 +134,29 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 	case "gitlab.continent":
 		res = string(jdata.GetStringBytes("Continent"))
 	case "gitlab.entity_id":
-		if jdata.GetInt("entity_id") > 0 {
-			res = fmt.Sprintf("%v", jdata.GetInt("entity_id"))
-		} else if jdata.GetInt("details","entity_id") > 0 {
-			res = fmt.Sprintf("%v", jdata.GetInt("details","entity_id"))	
+		if jdata.Exists("entity_id") {
+			valueType := jdata.Get("entity_id").Type()
+			if valueType == fastjson.TypeNumber {
+				if jdata.GetInt("entity_id") > 0 {
+					res = fmt.Sprintf("%v",jdata.GetInt("entity_id"))
+				} 
+			} else if valueType == fastjson.TypeString  {
+				if len(jdata.GetStringBytes("entity_id")) > 0 {
+					res = string(jdata.GetStringBytes("entity_id"))
+				}
+			}
+		} else if jdata.Exists("details", "entity_id") {
+			valueType := jdata.Get("details", "entity_id").Type()
+			if valueType == fastjson.TypeNumber {
+				if jdata.GetInt("details","entity_id") > 0 {
+					res = fmt.Sprintf("%v",jdata.GetInt("details","entity_id"))
+				} 
+			} else if valueType == fastjson.TypeString  {
+				if len(jdata.GetStringBytes("details","entity_id")) > 0 {
+					res = string(jdata.GetStringBytes("details","entity_id"))
+				}
+			}
+
 		}
 	case "gitlab.entity_type":
 		if len(jdata.GetStringBytes("entity_type")) > 0 {
