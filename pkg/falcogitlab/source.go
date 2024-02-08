@@ -255,17 +255,13 @@ func fetchAuditAPI(p *Plugin, oCtx *PluginInstance) {
 outerloop:
 	for {
 
-		// Sleep for the poll interval
-		if p.config.Debug  {
-			log.Printf("GitLab Plugin: Sleeping for " + fmt.Sprintf("%d", p.config.PollIntervalSecs) + " seconds")
-		}
-		time.Sleep(time.Duration(p.config.PollIntervalSecs) * time.Second)
 		
 		if p.config.Debug  {
 			log.Printf("GitLab Plugin: Authenticating against API")
 		}
 		// Authenticate with GitLab Token
-		git, err := gitlab.NewOAuthClient(p.config.GitLabToken, gitlab.WithBaseURL(p.config.GitLabBaseURL))
+		//git, err := gitlab.NewOAuthClient(p.config.GitLabToken, gitlab.WithBaseURL(p.config.GitLabBaseURL))
+		git, err := gitlab.NewClient(p.config.GitLabToken, gitlab.WithBaseURL(p.config.GitLabBaseURL))
 		if err != nil {
 			errorMessage := "GitLab Plugin ERROR: could not authenticate - check your gitlabtoken and gitlabbaseurl settings in falco.yaml - " + string(err.Error())
 			if breakOut(backoffcount, p.config.Debug, errorMessage, oCtx) {
@@ -362,7 +358,11 @@ outerloop:
 			println("GitLab Plugin: Closing GitLab Connection")
 		}
 		
-		
+		// Sleep for the poll interval
+		if p.config.Debug  {
+			log.Printf("GitLab Plugin: Sleeping for " + fmt.Sprintf("%d", p.config.PollIntervalSecs) + " seconds")
+		}
+		time.Sleep(time.Duration(p.config.PollIntervalSecs) * time.Second)
 
 
 	}
