@@ -19,6 +19,8 @@ package falcogitlab
 // PluginConfig represents a configuration of the GitHub plugin
 type PluginConfig struct {
 	APIOrWebhook      string `json:"APIOrWebhook" jsonschema:"title=api or webhook?,required,default=webhook,pattern=^(api|webhook)$"`
+	SaaSorManaged     string `json:"SaaSorManaged" jsonschema:"title=saas or managed?,required,default=saas,pattern=^(saas|managed)$"`
+	APIFetchGroups    []interface{}  `json:"APIFetchGroups" jsonschema:"title=which groups would you like to fetch the alerts for?,required"`
 	GitLabToken       string `json:"GitLabToken" jsonschema:"title=GitLab Token,required"`
 	GitLabBaseURL     string `json:"GitLabBaseURL" jsonschema:"title=GitLab Base URL (default: https://gitlab.com/),required,default=https://gitlab.com/,format=uri"`
 	MaxmindCityDBPath string `json:"MaxmindCityDBPath" jsonschema:"title=Path to Maxmind GeoLite2 or GeoIP2 City Database,required"`

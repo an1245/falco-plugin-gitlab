@@ -278,18 +278,40 @@ outerloop:
 			CreatedAfter: &querytimestamp,
 		}
 
-		// Query for audit events from the timestamp onwards
-		eventsArray, httpResponse, err := git.AuditEvents.ListInstanceAuditEvents(&auditEventOptions)
-		if err != nil || httpResponse.StatusCode != 200 {
-			errorMessage := "GitLab Plugin ERROR: Could not fetch initial Admin Streaming Logs Stream Position - " + string(err.Error())
-			if breakOut(backoffcount, p.config.Debug, errorMessage, oCtx) {
-				backoffcount += 1
-				continue outerloop
-			} else {
-				os.Exit(1)
+		var eventsArray []*gitlab.AuditEvent
+		var httpResponse *gitlab.Response
+
+		if p.config.SaaSorManaged == "saas" {
+
+			// Get all the groups and enumerate through them
+			for _, group := range p.config.APIFetchGroups {  
+				// Query for Group audit events
+				eventsArray, httpResponse, err = git.AuditEvents.ListGroupAuditEvents(fmt.Sprintf("%v",group), &auditEventOptions)
+				if err != nil || httpResponse.StatusCode != 200 {
+					errorMessage := "GitLab Plugin ERROR: Could not fetch initial Admin Streaming Logs Stream Position - " + string(err.Error())
+					if breakOut(backoffcount, p.config.Debug, errorMessage, oCtx) {
+						backoffcount += 1
+						continue outerloop
+					} else {
+						os.Exit(1)
+					}
+				}
+			}
+
+		} else if p.config.SaaSorManaged == "managed" {
+
+			// Query for instance audit events from the timestamp onwards
+			eventsArray, httpResponse, err = git.AuditEvents.ListInstanceAuditEvents(&auditEventOptions)
+			if err != nil || httpResponse.StatusCode != 200 {
+				errorMessage := "GitLab Plugin ERROR: Could not fetch initial Admin Streaming Logs Stream Position - " + string(err.Error())
+				if breakOut(backoffcount, p.config.Debug, errorMessage, oCtx) {
+					backoffcount += 1
+					continue outerloop
+				} else {
+					os.Exit(1)
+				}
 			}
 		}
-
 
 		// Loop through the events backwards and populate FalcoEvent
 		for i := len(eventsArray)-1; i >=0; i-- {
