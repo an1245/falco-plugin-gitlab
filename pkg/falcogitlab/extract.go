@@ -198,9 +198,39 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 			res = string(jdata.GetStringBytes("details","remove"))
 		}
 	case "gitlab.op_changed_from":
-		res = string(jdata.GetStringBytes("details","from"))
+		if jdata.Exists("details","from") {
+			valueType := jdata.Get("details","from").Type()
+			if valueType == fastjson.TypeNumber {
+				if jdata.GetInt("details","from") > 0 {
+					res = fmt.Sprintf("%v",jdata.GetInt("details","from"))
+				} 
+			} else if valueType == fastjson.TypeString  {
+				if len(jdata.GetStringBytes("details","from")) > 0 {
+					res = string(jdata.GetStringBytes("details","from"))
+				}
+			
+			} else if valueType == fastjson.TypeTrue || valueType == fastjson.TypeFalse  {
+					res = fmt.Sprintf("%t",jdata.GetBool("details","from"))
+				
+			}
+		} 
 	case "gitlab.op_changed_to":
-		res = string(jdata.GetStringBytes("details","to"))
+		if jdata.Exists("details","to") {
+			valueType := jdata.Get("details","to").Type()
+			if valueType == fastjson.TypeNumber {
+				if jdata.GetInt("details","to") > 0 {
+					res = fmt.Sprintf("%v",jdata.GetInt("details","to"))
+				} 
+			} else if valueType == fastjson.TypeString  {
+				if len(jdata.GetStringBytes("details","to")) > 0 {
+					res = string(jdata.GetStringBytes("details","to"))
+				}
+			
+			} else if valueType == fastjson.TypeTrue || valueType == fastjson.TypeFalse  {
+					res = fmt.Sprintf("%t",jdata.GetBool("details","to"))
+				
+			}
+		} 
 	case "gitlab.target_id":
 		if jdata.Exists("target_id") {
 			valueType := jdata.Get("target_id").Type()

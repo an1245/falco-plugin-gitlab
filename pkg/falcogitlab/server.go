@@ -118,7 +118,9 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 
 				for key, value := range r.Form {
 					eventjson := []byte(key)
-					println(string(eventjson))
+					if p.config.Debug {
+						println("GitLab Plugin Debug - received event JSON: " + string(eventjson))
+					}
 					err := json.Unmarshal(eventjson,&event)
 					if err != nil {
 						errorMessage := fmt.Sprintf("GitLab Plugin Error: Couldn't unmarshal event: %s", err )
@@ -260,8 +262,8 @@ type AuditEventDetails struct {
 	Add           string      `json:"add"`
 	As            string      `json:"as"`
 	Change        string      `json:"change"`
-	From          string      `json:"from"`
-	To            string      `json:"to"`
+	From          interface{} `json:"from"`
+	To            interface{} `json:"to"`
 	Remove        string      `json:"remove"`
 	CustomMessage interface{} `json:"custom_message"`
 	AuthorName    string      `json:"author_name"`
