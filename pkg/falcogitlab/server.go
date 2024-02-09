@@ -24,12 +24,9 @@ import (
 	"net"
 	"os"
 	"errors"
-	//"github.com/xanzy/go-gitlab"
 	"encoding/json"
 	"strings"
 	"time"
-	//"github.com/oschwald/geoip2-golang"
-
 )
 
 func createError(message string, oCtx *PluginInstance, p *Plugin) {
@@ -41,7 +38,7 @@ func createError(message string, oCtx *PluginInstance, p *Plugin) {
 	falcoalert := ErrorMessage{"pluginerror", message}
 	falcoalertjson, err := json.Marshal(falcoalert)
 	if err != nil {
-		log.Printf("GitLab Plugin Error - breakOut(): Couldn't Create Plugin Error JSON")
+		log.Printf("GitLab Plugin Error - createError(): Couldn't Create Plugin Error JSON")
 	}
 	oCtx.whSrvErrorChan <- falcoalertjson
 
