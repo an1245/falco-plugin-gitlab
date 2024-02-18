@@ -1,0 +1,378 @@
+# Login Events
+
+- list: gitlab_known_countries
+  items: [Ireland,Portugal, Spain, Germany]
+
+- rule: GitLab Admin Mode from unknown country
+  desc: User failed login by entering wrong password 
+  condition: gitlab.event_type=user_enable_admin_mode and not gitlab.country in (gitlab_known_countries)
+  output: |
+      GitLab Admin Mode from unknown country: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab Failed Login with Standard Authentication
+  desc: User failed login by entering wrong password 
+  condition: gitlab.event_type=login_failed_with_standard_authentication
+  output: |
+      GitLab Failed Login with Standard Authentication: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab Failed Login with failed OTP
+  desc: User failed login by entering incorrect OTP
+  condition: gitlab.event_type=login_failed_with_otp_authentication
+  output: |
+      GitLab Failed Login with failed OTP: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab Failed Login with failed WebAuthn
+  desc: User failed login by entering incorrect WebAuthn
+  condition: gitlab.event_type=login_failed_with_webauthn_authentication
+  output: |
+      GitLab Failed Login with failed WebAuthn: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - OmniAuth Authentication failed
+  desc: User failed login by entering incorrect WebAuthn
+  condition: gitlab.event_type=omniauth_login_failed
+  output: |
+      GitLab - OmniAuth Authentication failed
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - User Access has been locked
+  desc: User Access has been locked
+  condition: gitlab.event_type=user_access_locked
+  output: |
+      GitLab - User Access has been locked: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+# 2-Factor Authentication Changes 
+- rule: GitLab - User disabled two-factor authenticaton
+  desc: User disabled two-factor authenticaton
+  condition: gitlab.event_type=user_disable_two_factor
+  output: |
+      GitLab - User disabled two-factor authenticaton: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - Group 2-Factor Authenticaton configuration changed
+  desc: Group 2-Factor Authenticaton configuration changed
+  condition: gitlab.event_type in (group_require_two_factor_authentication_updated,group_two_factor_grace_period_updated)
+  output: |
+      GitLab - Group 2-Factor Authenticaton configuration changed: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+# SSH Key and Token Changes
+- rule: GitLab - SSH Certificate Created
+  desc: And SSH Certificate has been created.
+  condition: gitlab.event_type=create_ssh_certificate
+  output: |
+      GitLab - SSH Certificate Created: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - GPG Key Created
+  desc: New GPG Key has been added
+  condition: gitlab.event_type=add_gpg_key
+  output: |
+      GitLab - GPG Key Created: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - Personal Access Token Created
+  desc: New Personal Access Token Created
+  condition: gitlab.event_type=personal_access_token_created
+  output: |
+      GitLab - Personal Access Token Created: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - Project Access Token Created
+  desc: New Project Access Token Created
+  condition: gitlab.event_type=project_access_token_created
+  output: |
+      GitLab - Project Access Token Created: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - Group Access Token Created
+  desc: Group Access Token Created
+  condition: gitlab.event_type=group_access_token_created
+  output: |
+      GitLab - Group Access Token Created: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - Deploy Token Created
+  desc: Deploy Token Create
+  condition: gitlab.event_type=group_deploy_token_created
+  output: |
+      GitLab - Deploy Token Created: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - Cluster Agent Token Created
+  desc: Cluster Agent Token Created
+  condition: gitlab.event_type=cluster_agent_token_created
+  output: |
+      GitLab - Cluster Agent Token Created: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+  # Audit Event Destination CHanges
+- rule: GitLab - Audit Event Destination Filter Created
+  desc: Audit Event Destination Filter Created
+  condition: gitlab.event_type in (create_http_namespace_filter,event_type_filters_created)
+  output: |
+      GitLab - Audit Event Destination Filter Created: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - Audit Event Streaming Destination updated or destroyed
+  desc: Audit Event Streaming Destination updated or destroyed
+  condition: gitlab.event_type in (update_event_streaming_destination,update_instance_event_streaming_destination, destroy_event_streaming_destination,destroy_instance_event_streaming_destination,amazon_s3_configuration_deleted,amazon_s3_configuration_updated, google_cloud_logging_configuration_deleted, google_cloud_logging_configuration_updated, instance_amazon_s3_configuration_deleted, instance_amazon_s3_configuration_updated,instance_google_cloud_logging_configuration_deleted,instance_google_cloud_logging_configuration_updated)
+  output: |
+      GitLab - Audit Event Streaming Destination updated: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - Audit Event Streaming Header Update or Destroyed
+  desc: Audit Event Streaming Instance Header Update
+  condition: gitlab.event_type in (audit_events_streaming_headers_update, audit_events_streaming_headers_destroy, audit_events_streaming_instance_headers_update, audit_events_streaming_instance_headers_destroy)
+  output: |
+      GitLab - Audit Event Streaming Instance Header Update or Destroyed: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+
+- #rule: GitLab Catch All
+  #desc: Catch all rule for 
+  #condition: gitlab.created_at contains "20"
+  #output: |
+  #    GitLab Catch All rule: 
+  #    -------------------------------------------------------------------------------------------
+  #    Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+  #    IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+  #    Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+  #    Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+  #    Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+  #    Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+  #    Custom Message: %gitlab.custom_message
+  #    Failed Login: %gitlab.failed_login
+  #    -------------------------------------------------------------------------------------------
+  #priority: INFORMATIONAL
+  #source: gitlab
+  #tags: [gitlab]
+
+- rule: GitLab Plugin Error
+  desc: Errors from the GitLab plugin are alerted into Falco also 
+  condition: gitlab.event_type=pluginerror
+  output: >
+    %gitlab.pluginerrormessage
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
