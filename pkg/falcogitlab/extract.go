@@ -118,10 +118,22 @@ func getfieldStr(jdata *fastjson.Value, field string) (bool, string) {
 			res = string(jdata.GetStringBytes("details","author_class"))	
 		}
 	case "gitlab.custom_message":
-		if len(jdata.GetStringBytes("custom_message")) > 0 {
-			res = string(jdata.GetStringBytes("custom_message"))
-		} else if len(jdata.GetStringBytes("details","custom_message")) > 0{
-			res = string(jdata.GetStringBytes("details","custom_message"))	
+		if jdata.Exists("details", "custom_message") {
+			valueType := jdata.Get("details", "custom_message").Type()
+			if valueType == fastjson.TypeNumber {
+				if jdata.GetInt("details","custom_message") > 0 {
+					res = fmt.Sprintf("%v",jdata.GetInt("details","custom_message"))
+				} 
+			} else if valueType == fastjson.TypeString  {
+				if len(jdata.GetStringBytes("details","custom_message")) > 0{
+					res = string(jdata.GetStringBytes("details","custom_message"))	
+				}
+			} else if valueType == fastjson.TypeObject {
+				jsonObject := jdata.GetObject("details","custom_message")
+				jsonObjectValue := jsonObject.String()
+				res = string(jsonObjectValue)
+
+			}
 		}
 	case "gitlab.city":
 		res = string(jdata.GetStringBytes("City"))

@@ -1,7 +1,30 @@
-# Login Events
+
 
 - list: gitlab_known_countries
   items: [Ireland,Portugal, Spain, Germany]
+
+# Content Events
+
+- rule: GitLab Repository Operation made from unknown country
+  desc: Repository operation made from unknown country 
+  condition: gitlab.event_type=repository_git_operation and not gitlab.country in (gitlab_known_countries)
+  output: |
+      GitLab Repository Operation made from unknown country: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+# Login Events
 
 - rule: GitLab Admin Mode from unknown country
   desc: User failed login by entering wrong password 
