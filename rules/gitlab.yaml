@@ -316,7 +316,7 @@
   # Audit Event Destination CHanges
 - rule: GitLab - Audit Event Destination Filter Created
   desc: Audit Event Destination Filter Created
-  condition: gitlab.event_type in (create_http_namespace_filter,event_type_filters_created)
+  condition: gitlab.event_type in (create_http_namespace_filter,event_type_filters_created,created_group_namespace_filter,created_instance_namespace_filter)
   output: |
       GitLab - Audit Event Destination Filter Created: 
       -------------------------------------------------------------------------------------------
@@ -335,7 +335,7 @@
 
 - rule: GitLab - Audit Event Streaming Destination updated or destroyed
   desc: Audit Event Streaming Destination updated or destroyed
-  condition: gitlab.event_type in (update_event_streaming_destination,update_instance_event_streaming_destination, destroy_event_streaming_destination,destroy_instance_event_streaming_destination,amazon_s3_configuration_deleted,amazon_s3_configuration_updated, google_cloud_logging_configuration_deleted, google_cloud_logging_configuration_updated, instance_amazon_s3_configuration_deleted, instance_amazon_s3_configuration_updated,instance_google_cloud_logging_configuration_deleted,instance_google_cloud_logging_configuration_updated)
+  condition: gitlab.event_type in (update_event_streaming_destination,update_instance_event_streaming_destination, destroy_event_streaming_destination,destroy_instance_event_streaming_destination,amazon_s3_configuration_deleted,amazon_s3_configuration_updated, google_cloud_logging_configuration_deleted, google_cloud_logging_configuration_updated, instance_amazon_s3_configuration_deleted, instance_amazon_s3_configuration_updated,instance_google_cloud_logging_configuration_deleted,instance_google_cloud_logging_configuration_updated,updated_group_audit_event_streaming_destination,deleted_group_audit_event_streaming_destination,updated_instance_audit_event_streaming_destination,deleted_instance_audit_event_streaming_destination)
   output: |
       GitLab - Audit Event Streaming Destination updated: 
       -------------------------------------------------------------------------------------------
