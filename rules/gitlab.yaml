@@ -179,6 +179,26 @@
   source: gitlab
   tags: [gitlab]
 
+# User Changes
+- rule: GitLab - Administrator Access Level was enabled on a user
+  desc: Administrator Access Level was enabled on a user
+  condition: gitlab.event_type in (user_admin_status_updated) and gitlab.op_changed_to=true
+  output: |
+      GitLab - Administrator Access Level was enabled on a user: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
 # IP restrictions Changes
 - rule: GitLab - IP Restrictions Changed
   desc: IP Restrictons Changed
