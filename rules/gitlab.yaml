@@ -199,6 +199,45 @@
   source: gitlab
   tags: [gitlab]
 
+- rule: GitLab - Administrator impersonated another user
+  desc: Administrator impersonated another user
+  condition: gitlab.event_type in (user_impersonation)
+  output: |
+      GitLab - Administrator impersonated another user:
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: INFORMATIONAL
+  source: gitlab
+  tags: [gitlab]
+
+# Project Settings
+- rule: GitLab - Project Setting Require user re-authentication (password or SAML) to approve set to false
+  desc: Project Setting Require user re-authentication (password or SAML) to approve set to false
+  condition: gitlab.event_type in (project_require_password_to_approve_updated,require_reauthentication_to_approve_updated) and gitlab.op_changed_to=false
+  output: |
+      GitLab - Project Setting Require user re-authentication (password or SAML) to approve set to false
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
 # IP restrictions Changes
 - rule: GitLab - IP Restrictions Changed
   desc: IP Restrictons Changed
