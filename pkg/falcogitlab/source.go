@@ -107,7 +107,10 @@ func (p *Plugin) Open(params string) (source.Instance, error) {
 // Closing the event stream and deinitialize the open plugin instance.
 func (oCtx *PluginInstance) Close() {
 	println("GitLab Plugin: Closing Maxmind DB")
-	oCtx.geodb.Close()
+	err := oCtx.geodb.Close()
+	if err != nil {
+		log.Printf("GitLab Plugin - Failed to close Maxmind DB")
+	}
 }
 
 // Produce and return a new batch of events.

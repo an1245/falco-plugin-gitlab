@@ -26,6 +26,8 @@ import (
 	"github.com/oschwald/geoip2-golang"
 	"github.com/valyala/fastjson"
 	"net/http"
+	"os"
+	"log"
 )
 
 const (
@@ -96,7 +98,11 @@ func (p *Plugin) Init(cfg string) error {
 	// Since we provide a schema through InitSchema(), the framework
 	// guarantees that the config is always well-formed json.
 	p.config.Reset()
-	json.Unmarshal([]byte(cfg), &p.config)
+	err := json.Unmarshal([]byte(cfg), &p.config)
+	if err != nil {
+		log.Printf("GitLab Plugin: couldn't read config settings from Falco.yaml\n")
+		os.Exit(3)
+	}
 
 	return nil
 }

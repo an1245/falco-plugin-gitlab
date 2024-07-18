@@ -83,6 +83,7 @@ func webhookServer(p *Plugin, oCtx *PluginInstance){
 	// Create HTTP Server
 	oCtx.whSrv = &http.Server{
 		Handler: mux,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	// Connect HTTP Server
@@ -119,7 +120,10 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 		if len(tmpGitLabToken) > 0 {
 			if tmpGitLabToken == oCtx.whSecret {
 				// Token passed authentication
-				r.ParseForm()
+				err := r.ParseForm()
+				if err != nil {
+					log.Printf("GitLab Plugin: incoming payload didn't include HTTP form\n")
+				}
 
 				hasFailures := false
 
@@ -209,7 +213,10 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				// If there was request that failed to decode/encode then return a failure to the source.
 				if hasFailures {
 					w.WriteHeader(http.StatusBadRequest)
-					w.Write([]byte("At least one event in request failed"))
+					_, err := w.Write([]byte("At least one event in request failed"))
+					if err != nil {
+						log.Printf("GitLab Plugin: failed to decode incoming payload\n")
+					}
 					return
 				}
 
@@ -222,7 +229,10 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 				}
 				oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it didn't match configured secret")
 				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte("Authetication Failed"))
+				_, err := w.Write([]byte("Authetication Failed"))
+				if err != nil {
+					log.Printf("GitLab Plugin: failed to write failed authentication HTTP request response (3)\n")
+				}
 				return
 			}
 		} else {
@@ -233,7 +243,10 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 			}
 			oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request included X-Gitlab-Event-Streaming-Token header but it was zero length")
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Authetication Failed"))
+			_, err := w.Write([]byte("Authetication Failed"))
+			if err != nil {
+				log.Printf("GitLab Plugin: failed to write failed authentication HTTP request response (2)\n")
+			}
 			return
 		}
 	} else {
@@ -244,12 +257,18 @@ func handleHook(w http.ResponseWriter, r *http.Request, oCtx *PluginInstance, p 
 		}
 		oCtx.whSrvErrorChan <- []byte("GitLab Plugin Error: Request received without X-Gitlab-Event-Streaming-Token header")
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("Authetication Failed"))
+		_, err := w.Write([]byte("Authetication Failed"))
+		if err != nil {
+			log.Printf("GitLab Plugin: failed to write failed authentication HTTP request response (1)\n")
+		}
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Request Successful"))
+	_, err := w.Write([]byte("Request Successful"))
+	if err != nil {
+		log.Printf("GitLab Plugin: failed to write HTTP request response\n")
+	}
 	return
 }
 
