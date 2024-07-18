@@ -179,6 +179,104 @@
   source: gitlab
   tags: [gitlab]
 
+# User Changes
+- rule: GitLab - Administrator Access Level was enabled on a user
+  desc: Administrator Access Level was enabled on a user
+  condition: gitlab.event_type in (user_admin_status_updated) and gitlab.op_changed_to=true
+  output: |
+      GitLab - Administrator Access Level was enabled on a user: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - Administrator impersonated another user
+  desc: Administrator impersonated another user
+  condition: gitlab.event_type in (user_impersonation)
+  output: |
+      GitLab - Administrator impersonated another user:
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: INFORMATIONAL
+  source: gitlab
+  tags: [gitlab]
+
+# Project Settings
+- rule: GitLab - Project Setting Require user re-authentication (password or SAML) to approve set to false
+  desc: Project Setting Require user re-authentication (password or SAML) to approve set to false
+  condition: gitlab.event_type in (project_require_password_to_approve_updated,require_reauthentication_to_approve_updated) and gitlab.op_changed_to=false
+  output: |
+      GitLab - Project Setting Require user re-authentication (password or SAML) to approve set to false
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
+- rule: GitLab - Project owner has modified the linked Security Policy Project
+  desc: Project owner has modified the linked Security Policy Project
+  condition: gitlab.event_type in (policy_project_updated)
+  output: |
+      GitLab - Project owner has modified the linked Security Policy Project
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: INFORMATIONAL
+  source: gitlab
+  tags: [gitlab]
+
+# IP restrictions Changes
+- rule: GitLab - IP Restrictions Changed
+  desc: IP Restrictons Changed
+  condition: gitlab.event_type in (ip_restrictions_changed)
+  output: |
+      GitLab - IP Restrictions Changed: 
+      -------------------------------------------------------------------------------------------
+      Event ID: %gitlab.event_id,  Event Type: %gitlab.event_type, Created At: %gitlab.created_at
+      IP Address: %gitlab.ip_address, City: %gitlab.city, Country: %gitlab.country, Country ISO: %gitlab.countryisocode, Continent: %gitlab.continent
+      Author ID: %gitlab.author_id, Author Name: %gitlab.author_name, Author Email: %gitlab.author_email, Author Class: %gitlab.author_class,  
+      Entity ID: %gitlab.entity_id, Entity Type: %gitlab.entity_type, Entity Path: %gitlab.entity_path
+      Operation Type: %gitlab.op_type, Operation Item: %gitlab.op_item, Operation Changed From: %gitlab.op_changed_from, Operation Change To: %gitlab.op_changed_to
+      Target ID: %gitlab.target_id, Target Type: %gitlab.target_type, Target Details: %gitlab.target_details
+      Custom Message: %gitlab.custom_message
+      Failed Login: %gitlab.failed_login
+      -------------------------------------------------------------------------------------------
+  priority: WARNING
+  source: gitlab
+  tags: [gitlab]
+
 # SSH Key and Token Changes
 - rule: GitLab - SSH Certificate Created
   desc: And SSH Certificate has been created.
@@ -316,7 +414,7 @@
   # Audit Event Destination CHanges
 - rule: GitLab - Audit Event Destination Filter Created
   desc: Audit Event Destination Filter Created
-  condition: gitlab.event_type in (create_http_namespace_filter,event_type_filters_created)
+  condition: gitlab.event_type in (create_http_namespace_filter,event_type_filters_created,created_group_namespace_filter,created_instance_namespace_filter)
   output: |
       GitLab - Audit Event Destination Filter Created: 
       -------------------------------------------------------------------------------------------
@@ -335,7 +433,7 @@
 
 - rule: GitLab - Audit Event Streaming Destination updated or destroyed
   desc: Audit Event Streaming Destination updated or destroyed
-  condition: gitlab.event_type in (update_event_streaming_destination,update_instance_event_streaming_destination, destroy_event_streaming_destination,destroy_instance_event_streaming_destination,amazon_s3_configuration_deleted,amazon_s3_configuration_updated, google_cloud_logging_configuration_deleted, google_cloud_logging_configuration_updated, instance_amazon_s3_configuration_deleted, instance_amazon_s3_configuration_updated,instance_google_cloud_logging_configuration_deleted,instance_google_cloud_logging_configuration_updated)
+  condition: gitlab.event_type in (update_event_streaming_destination,update_instance_event_streaming_destination, destroy_event_streaming_destination,destroy_instance_event_streaming_destination,amazon_s3_configuration_deleted,amazon_s3_configuration_updated, google_cloud_logging_configuration_deleted, google_cloud_logging_configuration_updated, instance_amazon_s3_configuration_deleted, instance_amazon_s3_configuration_updated,instance_google_cloud_logging_configuration_deleted,instance_google_cloud_logging_configuration_updated,updated_group_audit_event_streaming_destination,deleted_group_audit_event_streaming_destination,updated_instance_audit_event_streaming_destination,deleted_instance_audit_event_streaming_destination)
   output: |
       GitLab - Audit Event Streaming Destination updated: 
       -------------------------------------------------------------------------------------------
